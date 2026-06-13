@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StageTrack — Connexion / Inscription</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #1B3F7A;
+    --navy-light: #254d8f;
+    --teal: #0EA5E9;
+    --teal-light: #e0f4fd;
+    --orange: #F97316;
+    --bg: #F0F4FA;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --error: #ef4444;
+    --error-light: #fef2f2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* LEFT PANEL */
+  .left-panel {
+    width: 46%; min-height: 100vh;
+    background: linear-gradient(145deg, #0c2a5c 0%, var(--navy) 45%, #1a5496 100%);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 48px 52px; position: relative; overflow: hidden;
+  }
+  .left-panel::before {
+    content: '';
+    position: absolute; top: -100px; right: -100px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(14,165,233,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .left-panel::after {
+    content: '';
+    position: absolute; bottom: -80px; left: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .left-logo { position: relative; z-index: 1; }
+  .logo-mark { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .logo-mark span { color: var(--teal); }
+  .logo-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.8px; text-transform: uppercase; }
+
+  .left-content { position: relative; z-index: 1; }
+  .left-tagline {
+    font-size: 34px; font-weight: 800; color: #fff;
+    line-height: 1.2; margin-bottom: 18px; letter-spacing: -0.5px;
+  }
+  .left-tagline span { color: var(--teal); }
+  .left-desc { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.7; max-width: 340px; }
+
+  .feature-list { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .feature-item { display: flex; align-items: center; gap: 12px; }
+  .feature-dot {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+  }
+  .feature-text { font-size: 13.5px; color: rgba(255,255,255,0.75); font-weight: 500; }
+
+  .left-footer { position: relative; z-index: 1; }
+  .left-footer-text { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  /* Floating card decoration */
+  .deco-card {
+    position: absolute; z-index: 1;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px); border-radius: 12px; padding: 14px 18px;
+  }
+  .deco-card-1 { right: 32px; top: 38%; }
+  .deco-card-2 { right: 60px; top: 55%; }
+  .deco-stat { font-size: 22px; font-weight: 800; color: #fff; }
+  .deco-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .deco-pill {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; color: rgba(255,255,255,0.85); font-weight: 500;
+  }
+  .deco-pill-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 48px 40px;
+  }
+  .auth-box { width: 100%; max-width: 440px; }
+
+  /* Tabs */
+  .auth-tabs {
+    display: flex; background: var(--bg); border-radius: 10px;
+    padding: 4px; margin-bottom: 28px; border: 1px solid var(--border);
+  }
+  .auth-tab {
+    flex: 1; text-align: center; padding: 10px 16px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    color: var(--text-muted); transition: all 0.2s; user-select: none;
+  }
+  .auth-tab.active {
+    background: var(--surface); color: var(--navy);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+
+  .auth-heading { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .auth-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+
+  /* Form */
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .form-label { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
+  .form-label .required { color: var(--orange); margin-left: 2px; }
+
+  .input-wrap { position: relative; }
+  .form-input {
+    width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid var(--border);
+    border-radius: 9px; font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--surface); transition: all 0.15s; outline: none;
+  }
+  .form-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }
+  .form-input.error { border-color: var(--error); background: var(--error-light); }
+  .form-input-plain {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 9px; font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--surface); transition: all 0.15s; outline: none;
+  }
+  .form-input-plain:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }
+  .input-icon {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; color: var(--text-muted); pointer-events: none;
+  }
+  .input-suffix {
+    position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; color: var(--text-muted); cursor: pointer;
+  }
+  .error-msg { font-size: 11.5px; color: var(--error); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+
+  .form-select {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 9px; font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--surface); outline: none;
+    cursor: pointer; transition: all 0.15s; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+  .form-select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px; margin: 20px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+  /* Step indicator */
+  .step-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 0;
+    margin-bottom: 28px;
+  }
+  .step-ind {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .step-ind-dot {
+    width: 30px; height: 30px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+  }
+  .step-ind-dot.done { background: var(--teal); color: #fff; }
+  .step-ind-dot.active { background: var(--navy); color: #fff; box-shadow: 0 0 0 4px rgba(27,63,122,0.15); }
+  .step-ind-dot.pending { background: var(--bg); color: var(--text-muted); border: 2px solid var(--border); }
+  .step-ind-label { font-size: 10.5px; font-weight: 600; color: var(--text-muted); }
+  .step-ind-label.active { color: var(--navy); }
+  .step-ind-line { width: 48px; height: 2px; background: var(--border); margin-bottom: 20px; }
+  .step-ind-line.done { background: var(--teal); }
+
+  .btn-primary {
+    width: 100%; padding: 13px; background: var(--navy); color: #fff;
+    border: none; border-radius: 9px; font-size: 14.5px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,63,122,0.25); }
+
+  .btn-secondary {
+    width: 100%; padding: 12px; background: transparent; color: var(--text-muted);
+    border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px;
+  }
+  .btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
+
+  .forgot-link { font-size: 13px; color: var(--teal); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .forgot-link:hover { text-decoration: underline; }
+
+  .switch-text { text-align: center; font-size: 13.5px; color: var(--text-muted); margin-top: 20px; }
+  .switch-link { color: var(--navy); font-weight: 700; cursor: pointer; }
+  .switch-link:hover { text-decoration: underline; }
+
+  .terms-text { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 14px; line-height: 1.6; }
+  .terms-text a { color: var(--teal); text-decoration: none; font-weight: 500; }
+
+  /* Success state */
+  .success-box {
+    text-align: center; padding: 20px 0;
+  }
+  .success-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), #0369a1);
+    margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; box-shadow: 0 8px 24px rgba(14,165,233,0.3);
+  }
+  .success-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+
+  /* Panel toggle */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Info banner */
+  .info-banner {
+    background: var(--teal-light); border: 1px solid #bae6fd;
+    border-radius: 9px; padding: 11px 14px;
+    font-size: 13px; color: #0369a1; font-weight: 500;
+    display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px;
+  }
+
+  /* Password strength */
+  .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+  .strength-seg { height: 4px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+  .strength-seg.weak { background: var(--error); }
+  .strength-seg.medium { background: var(--orange); }
+  .strength-seg.strong { background: var(--green, #22c55e); }
+  .strength-label { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-logo">
+    <div class="logo-mark">Stage<span>Track</span></div>
+    <div class="logo-sub">Université Mundiapolis</div>
+  </div>
+
+  <div class="left-content">
+    <div class="left-tagline">
+      Votre stage,<br/>suivi <span>intelligemment</span>.
+    </div>
+    <div class="left-desc">
+      Gérez vos documents, suivez votre progression et accédez aux meilleures offres — tout en un seul endroit.
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-dot">📋</div>
+        <div class="feature-text">Dépôt et validation de documents simplifiés</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot">📊</div>
+        <div class="feature-text">Suivi en temps réel de votre progression</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot">💼</div>
+        <div class="feature-text">Offres ciblées selon votre filière et niveau</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot">🎓</div>
+        <div class="feature-text">Planification des séances d'encadrement</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating deco cards -->
+  <div class="deco-card deco-card-1">
+    <div class="deco-stat">247</div>
+    <div class="deco-label">Stagiaires actifs</div>
+  </div>
+  <div class="deco-card deco-card-2">
+    <div class="deco-pill">
+      <div class="deco-pill-dot"></div>
+      Système en ligne
+    </div>
+  </div>
+
+  <div class="left-footer">
+    <div class="left-footer-text">© 2026 Université Mundiapolis · StageTrack v1.0</div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="showTab('login')">Se connecter</div>
+      <div class="auth-tab" onclick="showTab('register')">Créer un compte</div>
+    </div>
+
+    <!-- ===== LOGIN PANEL ===== -->
+    <div id="loginPanel" class="panel active">
+      <div class="auth-heading">Bon retour 👋</div>
+      <div class="auth-sub">Connectez-vous à votre espace étudiant StageTrack.</div>
+
+      <div class="form-group">
+        <label class="form-label">Adresse email <span class="required">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input class="form-input" type="email" placeholder="prenom.nom@mundiapolis.ma" value="ornella.zombre@mundiapolis.ma"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
+          <label class="form-label" style="margin-bottom:0">Mot de passe <span class="required">*</span></label>
+          <a class="forgot-link" onclick="showTab('forgot')">Mot de passe oublié ?</a>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input class="form-input" type="password" placeholder="••••••••" value="password123"/>
+          <span class="input-suffix">👁</span>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:22px">
+        <input type="checkbox" id="remember" style="width:16px;height:16px;accent-color:var(--navy)" checked/>
+        <label for="remember" style="font-size:13.5px; font-weight:500; cursor:pointer">Se souvenir de moi</label>
+      </div>
+
+      <button class="btn-primary" onclick="showTab('dashboard')">
+        Se connecter →
+      </button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">ou</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="btn-secondary" style="margin-top:0">
+        🎓 Connexion via ENT Mundiapolis
+      </button>
+
+      <div class="switch-text">
+        Pas encore de compte ?
+        <span class="switch-link" onclick="showTab('register')">Créer un compte</span>
+      </div>
+    </div>
+
+    <!-- ===== REGISTER PANEL ===== -->
+    <div id="registerPanel" class="panel">
+
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div class="step-ind">
+          <div class="step-ind-dot active" id="dot1">1</div>
+          <div class="step-ind-label active" id="lbl1">Identité</div>
+        </div>
+        <div class="step-ind-line" id="line1"></div>
+        <div class="step-ind">
+          <div class="step-ind-dot pending" id="dot2">2</div>
+          <div class="step-ind-label" id="lbl2">Académique</div>
+        </div>
+        <div class="step-ind-line" id="line2"></div>
+        <div class="step-ind">
+          <div class="step-ind-dot pending" id="dot3">3</div>
+          <div class="step-ind-label" id="lbl3">Sécurité</div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div id="step1" class="panel active">
+        <div class="auth-heading">Créer votre compte</div>
+        <div class="auth-sub">Étape 1 sur 3 — Vos informations personnelles</div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">Prénom <span class="required">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input class="form-input" type="text" placeholder="Ornella" value="Ornella"/>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Nom <span class="required">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input class="form-input" type="text" placeholder="Zombré" value="Zombré"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email universitaire <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input class="form-input" type="email" placeholder="prenom.nom@mundiapolis.ma"/>
+          </div>
+          <div class="error-msg" style="display:none">⚠ Utilisez votre adresse @mundiapolis.ma</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Téléphone <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input class="form-input" type="tel" placeholder="+212 6XX XX XX XX"/>
+          </div>
+          <div class="form-hint" style="font-size:11.5px;color:var(--text-muted);margin-top:4px">Utilisé pour les notifications urgentes uniquement</div>
+        </div>
+
+        <button class="btn-primary" onclick="goStep(2)">
+          Continuer → Infos académiques
+        </button>
+        <div class="switch-text">
+          Déjà inscrit ?
+          <span class="switch-link" onclick="showTab('login')">Se connecter</span>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" class="panel">
+        <div class="auth-heading">Profil académique</div>
+        <div class="auth-sub">Étape 2 sur 3 — Ces informations permettent de cibler vos offres et suivis.</div>
+
+        <div class="info-banner">
+          ℹ️ Ces informations sont utilisées pour vous affecter les bons encadrants et offres de stage.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">École <span class="required">*</span></label>
+          <select class="form-select">
+            <option value="">Sélectionner votre école</option>
+            <option selected>Mundiapolis</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">Filière <span class="required">*</span></label>
+            <select class="form-select">
+              <option value="">Filière</option>
+              <option selected>Génie Informatique</option>
+              <option>Génie Industriel</option>
+              <option>Génie Civil</option>
+              <option>Management</option>
+              <option>Finance</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Niveau <span class="required">*</span></label>
+            <select class="form-select">
+              <option value="">Niveau</option>
+              <option>L3</option>
+              <option>1A</option>
+              <option>2A</option>
+              <option>4A</option>
+              <option selected>5A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Année académique <span class="required">*</span></label>
+          <select class="form-select">
+            <option selected>2025 – 2026</option>
+            <option>2024 – 2025</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type de stage</label>
+          <div style="display:flex; gap:10px">
+            <label style="flex:1; padding:12px; border:1.5px solid var(--teal); border-radius:9px; cursor:pointer; background:var(--teal-light); display:flex; align-items:center; gap:8px">
+              <input type="radio" name="typestage" checked style="accent-color:var(--navy)"/>
+              <span style="font-size:13.5px; font-weight:600; color:#0369a1">PFE</span>
+            </label>
+            <label style="flex:1; padding:12px; border:1.5px solid var(--border); border-radius:9px; cursor:pointer; display:flex; align-items:center; gap:8px">
+              <input type="radio" name="typestage" style="accent-color:var(--navy)"/>
+              <span style="font-size:13.5px; font-weight:600">PFA</span>
+            </label>
+            <label style="flex:1; padding:12px; border:1.5px solid var(--border); border-radius:9px; cursor:pointer; display:flex; align-items:center; gap:8px">
+              <input type="radio" name="typestage" style="accent-color:var(--navy)"/>
+              <span style="font-size:13.5px; font-weight:600">Alternance</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="width:auto; padding:12px 20px; margin-top:0" onclick="goStep(1)">← Retour</button>
+          <button class="btn-primary" onclick="goStep(3)">Continuer → Sécurité</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" class="panel">
+        <div class="auth-heading">Sécurisez votre compte</div>
+        <div class="auth-sub">Étape 3 sur 3 — Choisissez un mot de passe sécurisé.</div>
+
+        <div class="form-group">
+          <label class="form-label">Mot de passe <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input class="form-input" type="password" placeholder="••••••••" id="pwdInput" oninput="checkStrength(this.value)"/>
+            <span class="input-suffix">👁</span>
+          </div>
+          <div class="strength-bar">
+            <div class="strength-seg" id="s1"></div>
+            <div class="strength-seg" id="s2"></div>
+            <div class="strength-seg" id="s3"></div>
+            <div class="strength-seg" id="s4"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel">Entrez un mot de passe</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmer le mot de passe <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input class="form-input" type="password" placeholder="••••••••"/>
+            <span class="input-suffix">👁</span>
+          </div>
+        </div>
+
+        <div style="background:var(--bg); border-radius:9px; padding:14px; margin-bottom:20px; border:1px solid var(--border)">
+          <div style="font-size:12.5px; font-weight:600; margin-bottom:8px">Le mot de passe doit contenir :</div>
+          <div style="display:flex; flex-direction:column; gap:5px">
+            <div style="font-size:12.5px; color:var(--text-muted); display:flex; gap:6px">✓ <span>Au moins 8 caractères</span></div>
+            <div style="font-size:12.5px; color:var(--text-muted); display:flex; gap:6px">✓ <span>Une lettre majuscule</span></div>
+            <div style="font-size:12.5px; color:var(--text-muted); display:flex; gap:6px">✓ <span>Un chiffre</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:8px; margin-bottom:20px">
+          <input type="checkbox" id="terms" style="width:16px;height:16px;accent-color:var(--navy);margin-top:2px" checked/>
+          <label for="terms" style="font-size:13px; color:var(--text-muted); cursor:pointer; line-height:1.5">
+            J'accepte les <a style="color:var(--teal); font-weight:600">conditions d'utilisation</a> et la <a style="color:var(--teal); font-weight:600">politique de confidentialité</a> de Mundiapolis.
+          </label>
+        </div>
+
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="width:auto; padding:12px 20px; margin-top:0" onclick="goStep(2)">← Retour</button>
+          <button class="btn-primary" onclick="showTab('success')">Créer mon compte 🎉</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== FORGOT PASSWORD ===== -->
+    <div id="forgotPanel" class="panel">
+      <div class="auth-heading">Mot de passe oublié</div>
+      <div class="auth-sub">Entrez votre email universitaire et nous vous enverrons un lien de réinitialisation.</div>
+
+      <div class="form-group">
+        <label class="form-label">Email universitaire <span class="required">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input class="form-input" type="email" placeholder="prenom.nom@mundiapolis.ma"/>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="showTab('success')">Envoyer le lien →</button>
+      <button class="btn-secondary" style="margin-top:10px" onclick="showTab('login')">← Retour à la connexion</button>
+    </div>
+
+    <!-- ===== SUCCESS ===== -->
+    <div id="successPanel" class="panel">
+      <div class="success-box">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Compte créé avec succès !</div>
+        <div class="success-sub">
+          Bienvenue sur StageTrack, Ornella 🎉<br/>
+          Un email de confirmation a été envoyé à <strong>ornella.zombre@mundiapolis.ma</strong>
+        </div>
+        <button class="btn-primary" style="max-width:280px; margin:0 auto" onclick="showTab('login')">
+          Accéder à mon espace →
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+
+  function showTab(tab) {
+    // Hide all panels
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+
+    if (tab === 'login') {
+      document.getElementById('loginPanel').classList.add('active');
+      document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    } else if (tab === 'register') {
+      document.getElementById('registerPanel').classList.add('active');
+      document.querySelectorAll('.auth-tab')[1].classList.add('active');
+      goStep(1);
+    } else if (tab === 'forgot') {
+      document.getElementById('forgotPanel').classList.add('active');
+    } else if (tab === 'success') {
+      document.getElementById('successPanel').classList.add('active');
+    } else if (tab === 'dashboard') {
+      // Simulate redirect
+      alert('✅ Connexion réussie ! Redirection vers le tableau de bord…');
+    }
+  }
+
+  function goStep(step) {
+    // Hide all steps
+    [1,2,3].forEach(i => {
+      document.getElementById('step'+i)?.classList.remove('active');
+    });
+    document.getElementById('step'+step)?.classList.add('active');
+    currentStep = step;
+
+    // Update step indicator
+    [1,2,3].forEach(i => {
+      const dot = document.getElementById('dot'+i);
+      const lbl = document.getElementById('lbl'+i);
+      if (!dot) return;
+      dot.className = 'step-ind-dot ' + (i < step ? 'done' : i === step ? 'active' : 'pending');
+      dot.textContent = i < step ? '✓' : i;
+      if (lbl) {
+        lbl.className = 'step-ind-label' + (i === step ? ' active' : '');
+      }
+    });
+    // Update lines
+    [1,2].forEach(i => {
+      const line = document.getElementById('line'+i);
+      if (line) line.className = 'step-ind-line' + (i < step ? ' done' : '');
+    });
+  }
+
+  function checkStrength(val) {
+    const segs = [document.getElementById('s1'),document.getElementById('s2'),document.getElementById('s3'),document.getElementById('s4')];
+    const lbl = document.getElementById('strengthLabel');
+    segs.forEach(s => s.className = 'strength-seg');
+    if (!val) { lbl.textContent = 'Entrez un mot de passe'; return; }
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+    const labels = ['', 'Faible', 'Faible', 'Moyen', 'Fort'];
+    for (let i = 0; i < score; i++) segs[i].classList.add(cls);
+    lbl.textContent = 'Force : ' + (labels[score] || '');
+    lbl.style.color = cls === 'weak' ? 'var(--error)' : cls === 'medium' ? 'var(--orange)' : '#16a34a';
+  }
+</script>
+</body>
+</html>
