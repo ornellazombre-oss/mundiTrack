@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StageTrack — Espace Étudiant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #1B3F7A;
+    --navy-light: #254d8f;
+    --teal: #0EA5E9;
+    --teal-light: #e0f4fd;
+    --orange: #F97316;
+    --orange-light: #fff3e8;
+    --green: #22c55e;
+    --green-light: #e9faf0;
+    --purple: #8B5CF6;
+    --purple-light: #f0ebff;
+    --bg: #F0F4FA;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; min-height: 100vh; background: var(--navy);
+    display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 10;
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .logo-mark {
+    font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
+  }
+  .logo-mark span { color: var(--teal); }
+  .logo-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .sidebar-user {
+    margin: 16px 16px 8px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), #0369a1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .user-level { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+
+  .sidebar-nav { padding: 12px 12px; flex: 1; }
+  .nav-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px; margin-bottom: 2px;
+    color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(14,165,233,0.2); color: #fff; }
+  .nav-item.active .nav-icon { color: var(--teal); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--orange); color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
+  }
+
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-footer .nav-item { margin-bottom: 0; }
+
+  /* MAIN */
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 5;
+  }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
+  .topbar-sub { font-size: 13px; color: var(--text-muted); margin-top: 1px; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+  .notif-btn {
+    width: 38px; height: 38px; border-radius: 8px; background: var(--bg);
+    border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; font-size: 17px;
+  }
+  .notif-dot {
+    width: 8px; height: 8px; background: var(--orange); border-radius: 50%;
+    position: absolute; top: 6px; right: 6px; border: 1.5px solid #fff;
+  }
+
+  .content { padding: 28px 32px; }
+
+  /* STAGE PROGRESS TIMELINE — signature element */
+  .stage-timeline-card {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e4fa3 60%, #0c3470 100%);
+    border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  .stage-timeline-card::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .stage-timeline-card::after {
+    content: '';
+    position: absolute; bottom: -40px; left: 40%;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .stc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; position: relative; z-index: 1; }
+  .stc-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.8px; }
+  .stc-stage-name { font-size: 22px; font-weight: 800; color: #fff; margin-top: 4px; }
+  .stc-company { font-size: 14px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+  .stc-badge {
+    background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.4);
+    color: #4ade80; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .stc-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Timeline steps */
+  .timeline-steps { display: flex; align-items: center; position: relative; z-index: 1; }
+  .timeline-line {
+    flex: 1; height: 3px;
+    background: rgba(255,255,255,0.15);
+    position: relative;
+  }
+  .timeline-line.done { background: var(--teal); }
+  .timeline-line.partial {
+    background: linear-gradient(to right, var(--teal) 60%, rgba(255,255,255,0.15) 60%);
+  }
+  .step {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    position: relative;
+  }
+  .step-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-dot.done { background: var(--teal); color: #fff; box-shadow: 0 0 0 4px rgba(14,165,233,0.25); }
+  .step-dot.active { background: #fff; color: var(--navy); box-shadow: 0 0 0 4px rgba(255,255,255,0.2); }
+  .step-dot.pending { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); border: 2px solid rgba(255,255,255,0.15); }
+  .step-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55); text-align: center; width: 70px; line-height: 1.3; white-space: nowrap; }
+  .step-label.done { color: rgba(255,255,255,0.85); }
+  .step-label.active { color: #fff; font-weight: 700; }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 20px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .card-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .card-body { padding: 20px; }
+
+  /* Stat mini cards */
+  .stat-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    padding: 20px 22px; display: flex; align-items: center; gap: 14px;
+  }
+  .stat-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .stat-value { font-size: 24px; font-weight: 800; color: var(--text); }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Documents list */
+  .doc-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .doc-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .doc-item:first-child { padding-top: 0; }
+  .doc-icon {
+    width: 38px; height: 38px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0;
+  }
+  .doc-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .doc-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .doc-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+  /* Status pills */
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
+  }
+  .pill::before { content: '●'; font-size: 7px; }
+  .pill-green { background: var(--green-light); color: #16a34a; }
+  .pill-orange { background: var(--orange-light); color: #ea580c; }
+  .pill-blue { background: var(--teal-light); color: #0369a1; }
+  .pill-purple { background: var(--purple-light); color: #7c3aed; }
+  .pill-gray { background: #f1f5f9; color: #64748b; }
+
+  /* Action button small */
+  .btn-sm {
+    padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-sm-primary { background: var(--navy); color: #fff; }
+  .btn-sm-teal { background: var(--teal-light); color: #0369a1; }
+  .btn-sm-orange { background: var(--orange-light); color: #ea580c; }
+  .btn-icon {
+    width: 30px; height: 30px; border-radius: 7px; background: var(--bg);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+  }
+
+  /* Rapport hebdo form */
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 10px 13px; border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 13.5px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--bg); transition: border 0.15s;
+    outline: none;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--teal); background: #fff; }
+  .form-textarea { min-height: 80px; resize: vertical; }
+  .form-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+  .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 10px 13px; background: var(--bg); border-radius: 8px; }
+  .checkbox-row input { width: 16px; height: 16px; accent-color: var(--navy); }
+  .checkbox-row label { font-size: 13.5px; font-weight: 500; cursor: pointer; }
+
+  /* Offres */
+  .offre-item {
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .offre-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .offre-item:first-child { padding-top: 0; }
+  .offre-logo {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--bg);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .offre-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .offre-company { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .offre-tags { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+  .tag {
+    padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 500;
+    background: var(--bg); color: var(--text-muted); border: 1px solid var(--border);
+  }
+  .tag-blue { background: var(--teal-light); color: #0369a1; border-color: #bae6fd; }
+
+  /* Progress bar */
+  .progress-bar-wrap { background: var(--bg); border-radius: 99px; height: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(to right, var(--teal), var(--navy)); }
+
+  /* Encadrement timeline */
+  .seance-item {
+    display: flex; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .seance-item:last-child { border-bottom: none; }
+  .seance-dot-col { display: flex; flex-direction: column; align-items: center; }
+  .seance-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .seance-dot.done { background: var(--green); }
+  .seance-dot.upcoming { background: var(--teal); }
+  .seance-dot.pending { background: var(--border); }
+  .seance-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; margin-bottom: -12px; }
+  .seance-date { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
+  .seance-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .seance-type { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 9px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; text-align: center; padding: 8px 12px; border-radius: 7px;
+    font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--surface); color: var(--text); font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  /* Section title */
+  .section-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title span { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+
+  /* Alert banner */
+  .alert-banner {
+    padding: 12px 16px; border-radius: 10px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px; font-size: 13.5px; font-weight: 500;
+  }
+  .alert-orange { background: var(--orange-light); border: 1px solid #fed7aa; color: #9a3412; }
+  .alert-blue { background: var(--teal-light); border: 1px solid #bae6fd; color: #0369a1; }
+
+  /* Responsive safety */
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">Stage<span>Track</span></div>
+    <div class="logo-sub">Université Mundiapolis</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">OZ</div>
+    <div>
+      <div class="user-name">Ornella Zombré</div>
+      <div class="user-level">5A Génie Informatique</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Mon espace</div>
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">🏠</span> Tableau de bord
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📋</span> Mon stage
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📁</span> Documents
+      <span class="nav-badge">2</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📝</span> Rapport hebdo
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📅</span> Encadrement
+    </a>
+    <div class="nav-label">Opportunités</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">💼</span> Offres de stage
+      <span class="nav-badge">5</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📚</span> Historique
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⚙️</span> Paramètres
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🚪</span> Déconnexion
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Tableau de bord</div>
+      <div class="topbar-sub">Bienvenue, Ornella 👋 — Semaine 7 de stage</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+      <button class="btn btn-primary">＋ Rapport hebdo</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Alert -->
+    <div class="alert-banner alert-orange">
+      ⚠️ <strong>Action requise :</strong> Votre rapport de la semaine 7 n'a pas encore été soumis. Date limite : vendredi 13 juin.
+    </div>
+
+    <!-- TIMELINE CARD — signature element -->
+    <div class="stage-timeline-card">
+      <div class="stc-header">
+        <div>
+          <div class="stc-title">PFE · 5A Ingénieur</div>
+          <div class="stc-stage-name">Développement d'une application web de suivi</div>
+          <div class="stc-company">🏢 Université Mundiapolis · Casablanca</div>
+        </div>
+        <div class="stc-badge">En cours</div>
+      </div>
+
+      <div class="timeline-steps">
+        <div class="step">
+          <div class="step-dot done">✓</div>
+          <div class="step-label done">Inscription</div>
+        </div>
+        <div class="timeline-line done"></div>
+        <div class="step">
+          <div class="step-dot done">✓</div>
+          <div class="step-label done">CV validé</div>
+        </div>
+        <div class="timeline-line done"></div>
+        <div class="step">
+          <div class="step-dot done">✓</div>
+          <div class="step-label done">Confirmé</div>
+        </div>
+        <div class="timeline-line done"></div>
+        <div class="step">
+          <div class="step-dot active">◉</div>
+          <div class="step-label active">En cours</div>
+        </div>
+        <div class="timeline-line"></div>
+        <div class="step">
+          <div class="step-dot pending">○</div>
+          <div class="step-label">Soutenance</div>
+        </div>
+        <div class="timeline-line"></div>
+        <div class="step">
+          <div class="step-dot pending">○</div>
+          <div class="step-label">Terminé</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff">📊</div>
+        <div>
+          <div class="stat-value">7/16</div>
+          <div class="stat-label">Semaines de stage</div>
+          <div style="margin-top:8px">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:44%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--green-light)">📎</div>
+        <div>
+          <div class="stat-value">4/6</div>
+          <div class="stat-label">Documents déposés</div>
+          <div style="margin-top:8px">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:67%; background: linear-gradient(to right, var(--green), #16a34a)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--purple-light)">🎓</div>
+        <div>
+          <div class="stat-value">2/4</div>
+          <div class="stat-label">Séances d'encadrement</div>
+          <div style="margin-top:8px">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:50%; background: linear-gradient(to right, var(--purple), #7c3aed)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM GRID -->
+    <div class="grid-2">
+
+      <!-- DOCUMENTS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📁 Mes documents</div>
+          <button class="btn-sm btn-sm-teal">Déposer un fichier</button>
+        </div>
+        <div class="card-body">
+          <div class="doc-item">
+            <div class="doc-icon" style="background:#eff6ff">📄</div>
+            <div>
+              <div class="doc-name">Convention de stage</div>
+              <div class="doc-sub">Déposée le 12 avril 2026</div>
+            </div>
+            <div class="doc-actions">
+              <span class="pill pill-green">Validée</span>
+              <div class="btn-icon">⬇</div>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:#f0fdf4">📋</div>
+            <div>
+              <div class="doc-name">Fiche descriptive de mission</div>
+              <div class="doc-sub">Déposée le 14 avril 2026</div>
+            </div>
+            <div class="doc-actions">
+              <span class="pill pill-green">Validée</span>
+              <div class="btn-icon">⬇</div>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:#fff7ed">🛡️</div>
+            <div>
+              <div class="doc-name">Attestation d'assurance</div>
+              <div class="doc-sub">Déposée le 14 avril 2026</div>
+            </div>
+            <div class="doc-actions">
+              <span class="pill pill-blue">En validation</span>
+              <div class="btn-icon">⬇</div>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:#fdf4ff">📊</div>
+            <div>
+              <div class="doc-name">Rapport de stage</div>
+              <div class="doc-sub">À déposer avant la soutenance</div>
+            </div>
+            <div class="doc-actions">
+              <span class="pill pill-gray">À déposer</span>
+              <button class="btn-sm btn-sm-orange">Déposer</button>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:#f0f9ff">🏆</div>
+            <div>
+              <div class="doc-name">Attestation de fin de stage</div>
+              <div class="doc-sub">Fournie par l'entreprise</div>
+            </div>
+            <div class="doc-actions">
+              <span class="pill pill-gray">À déposer</span>
+              <button class="btn-sm btn-sm-orange">Déposer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex; flex-direction:column; gap:20px">
+
+        <!-- RAPPORT HEBDO -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">📝 Rapport — Semaine 7</div>
+            </div>
+            <span class="pill pill-orange">Non soumis</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Tâches effectuées cette semaine</label>
+              <textarea class="form-textarea" placeholder="Ex : Finalisation du module de gestion des documents, rédaction de tests unitaires…"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Difficultés rencontrées</label>
+              <textarea class="form-textarea" style="min-height:60px" placeholder="Ex : Problèmes d'intégration avec l'API, besoin d'aide sur…"></textarea>
+            </div>
+            <div class="form-group">
+              <div class="checkbox-row">
+                <input type="checkbox" id="presence" checked/>
+                <label for="presence">Présent(e) toute la semaine en entreprise</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center">Soumettre le rapport ✓</button>
+          </div>
+        </div>
+
+        <!-- SÉANCES D'ENCADREMENT -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎓 Séances d'encadrement</div>
+            <span style="font-size:12px; color:var(--text-muted)">Pr. A. Benali</span>
+          </div>
+          <div class="card-body">
+            <div class="seance-item">
+              <div class="seance-dot-col">
+                <div class="seance-dot done"></div>
+                <div class="seance-line"></div>
+              </div>
+              <div>
+                <div class="seance-title">Séance 1 — Cadrage du sujet</div>
+                <div class="seance-date">15 avril 2026</div>
+                <div class="seance-type">📍 Présentiel · Bureau B204</div>
+              </div>
+            </div>
+            <div class="seance-item">
+              <div class="seance-dot-col">
+                <div class="seance-dot done"></div>
+                <div class="seance-line"></div>
+              </div>
+              <div>
+                <div class="seance-title">Séance 2 — Revue analyse</div>
+                <div class="seance-date">12 mai 2026</div>
+                <div class="seance-type">💬 WhatsApp</div>
+              </div>
+            </div>
+            <div class="seance-item">
+              <div class="seance-dot-col">
+                <div class="seance-dot upcoming"></div>
+                <div class="seance-line"></div>
+              </div>
+              <div>
+                <div class="seance-title">Séance 3 — Point mi-parcours</div>
+                <div class="seance-date">18 juin 2026 · 10h00</div>
+                <div class="seance-type">📍 Présentiel</div>
+              </div>
+            </div>
+            <div class="seance-item">
+              <div class="seance-dot-col">
+                <div class="seance-dot pending"></div>
+              </div>
+              <div>
+                <div class="seance-title">Séance 4 — Revue finale</div>
+                <div class="seance-date">À planifier</div>
+                <div class="seance-type" style="color:var(--text-muted)">— Non planifiée</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- OFFRES DE STAGE -->
+    <div class="card" style="margin-top:4px">
+      <div class="card-header">
+        <div class="card-title">💼 Offres récentes pour vous</div>
+        <button class="btn btn-outline">Voir toutes les offres →</button>
+      </div>
+      <div class="card-body">
+        <div class="alert-banner alert-blue" style="margin-bottom:16px">
+          📣 5 nouvelles offres correspondent à votre profil (5A · Génie Informatique)
+        </div>
+        <div class="offre-item">
+          <div class="offre-logo">🏦</div>
+          <div style="flex:1">
+            <div class="offre-title">Développeur Full-Stack — Projet Fintech</div>
+            <div class="offre-company">Attijariwafa Bank · Casablanca</div>
+            <div class="offre-tags">
+              <span class="tag tag-blue">5A Ingénieur</span>
+              <span class="tag tag-blue">PFE</span>
+              <span class="tag">React · Node.js</span>
+              <span class="tag">6 mois</span>
+            </div>
+          </div>
+          <button class="btn-sm btn-sm-primary">Postuler</button>
+        </div>
+        <div class="offre-item">
+          <div class="offre-logo">☁️</div>
+          <div style="flex:1">
+            <div class="offre-title">Ingénieur Cloud & DevOps</div>
+            <div class="offre-company">OCP Group · Casablanca</div>
+            <div class="offre-tags">
+              <span class="tag tag-blue">5A Ingénieur</span>
+              <span class="tag tag-blue">PFE</span>
+              <span class="tag">AWS · Kubernetes</span>
+              <span class="tag">6 mois</span>
+            </div>
+          </div>
+          <button class="btn-sm btn-sm-primary">Postuler</button>
+        </div>
+        <div class="offre-item">
+          <div class="offre-logo">🤖</div>
+          <div style="flex:1">
+            <div class="offre-title">Stage IA & Data Engineering</div>
+            <div class="offre-company">Inwi · Rabat</div>
+            <div class="offre-tags">
+              <span class="tag tag-blue">5A Ingénieur</span>
+              <span class="tag tag-blue">PFE</span>
+              <span class="tag">Python · ML</span>
+              <span class="tag">6 mois</span>
+            </div>
+          </div>
+          <button class="btn-sm btn-sm-primary">Postuler</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>
