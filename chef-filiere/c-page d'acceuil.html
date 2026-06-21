@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MundiTrack — Chef de Filière</title>
+<title>MundiTrack — Vue globale multi-filières</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
   :root {
@@ -18,6 +18,8 @@
     --green-light: #e9faf0;
     --purple: #8B5CF6;
     --purple-light: #f0ebff;
+    --red: #ef4444;
+    --red-light: #fef2f2;
     --bg: #F0F4FA;
     --surface: #ffffff;
     --text: #0f172a;
@@ -44,7 +46,6 @@
   .logo-icon img { width: 100%; height: 100%; filter: brightness(0) invert(1); }
   .logo-text-wrap { line-height: 1.1; }
   .logo-mark { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
-  .logo-mark .undi { color: #fff; }
   .logo-mark .track { color: var(--teal); }
   .logo-sub { font-size: 10.5px; color: rgba(255,255,255,0.45); margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -75,7 +76,6 @@
   }
   .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .nav-item.active { background: rgba(14,165,233,0.2); color: #fff; }
-  .nav-item.active .nav-icon { color: var(--teal); }
   .nav-icon { font-size: 16px; width: 20px; text-align: center; }
   .nav-badge {
     margin-left: auto; background: var(--orange); color: #fff;
@@ -83,10 +83,7 @@
   }
   .nav-badge.muted { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
 
-  .sidebar-footer {
-    padding: 16px 12px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
+  .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.1); }
 
   /* MAIN */
   .main { margin-left: 248px; flex: 1; min-height: 100vh; }
@@ -103,8 +100,6 @@
     padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
     border: none; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
   }
-  .btn-primary { background: var(--navy); color: #fff; }
-  .btn-primary:hover { background: var(--navy-light); }
   .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
   .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
   .notif-btn {
@@ -119,117 +114,132 @@
 
   .content { padding: 28px 32px; }
 
-  /* Priority alert - rapports hebdo non lus, mis en avant */
-  .priority-banner {
-    background: linear-gradient(135deg, #fff3e8, #ffeede);
-    border: 1.5px solid #fed7aa; border-radius: var(--radius);
-    padding: 18px 22px; margin-bottom: 24px;
-    display: flex; align-items: center; gap: 16px;
+  /* Mode toggle */
+  .mode-toggle {
+    display: inline-flex; background: var(--bg); padding: 4px; border-radius: 10px;
+    border: 1px solid var(--border); margin-bottom: 24px;
   }
-  .priority-icon {
-    width: 44px; height: 44px; border-radius: 12px; background: var(--orange);
+  .mode-tab {
+    padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600;
+    color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .mode-tab.active { background: var(--surface); color: var(--navy); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* Welcome header */
+  .welcome-block { margin-bottom: 24px; }
+  .welcome-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .welcome-sub { font-size: 14px; color: var(--text-muted); }
+  .welcome-sub strong { color: var(--navy); font-weight: 700; }
+
+  /* Global summary banner */
+  .global-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e4fa3 55%, #0c3470 100%);
+    border-radius: var(--radius); padding: 24px 28px; margin-bottom: 28px;
+    display: flex; align-items: center; gap: 32px; position: relative; overflow: hidden;
+  }
+  .global-banner::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(14,165,233,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .gb-stat { position: relative; z-index: 1; }
+  .gb-value { font-size: 30px; font-weight: 800; color: #fff; line-height: 1; }
+  .gb-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px; font-weight: 500; }
+  .gb-divider { width: 1px; height: 44px; background: rgba(255,255,255,0.15); position: relative; z-index: 1; }
+  .gb-value.alert { color: #fca5a5; }
+
+  /* Section title */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Filière cards grid */
+  .filiere-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+
+  .filiere-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    padding: 22px; cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .filiere-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.08), 0 12px 28px rgba(0,0,0,0.1); border-color: var(--teal); }
+
+  .filiere-card.urgent { border-color: #fecaca; }
+  .filiere-card.urgent::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--red);
+  }
+  .filiere-card.ok::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--green);
+  }
+
+  .fc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .fc-icon {
+    width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; font-size: 20px;
-    flex-shrink: 0; color: #fff;
   }
-  .priority-text { flex: 1; }
-  .priority-title { font-size: 14.5px; font-weight: 700; color: #9a3412; }
-  .priority-sub { font-size: 12.5px; color: #9a3412; opacity: 0.8; margin-top: 2px; }
-  .priority-action {
-    padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
-    background: var(--orange); color: #fff; border: none; cursor: pointer;
-    white-space: nowrap;
+  .fc-urgent-badge {
+    background: var(--red-light); color: var(--red);
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .fc-urgent-badge::before { content: '●'; font-size: 7px; }
+  .fc-ok-badge {
+    background: var(--green-light); color: #16a34a;
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
   }
 
-  /* STAT CARDS - sans soutenances */
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
-  .stat-card {
+  .fc-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .fc-niveau { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+
+  .fc-stats-row { display: flex; gap: 18px; margin-bottom: 16px; }
+  .fc-stat-mini { flex: 1; }
+  .fc-stat-mini-value { font-size: 20px; font-weight: 800; color: var(--text); }
+  .fc-stat-mini-label { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+
+  .fc-progress-wrap { background: var(--bg); border-radius: 99px; height: 6px; overflow: hidden; margin-bottom: 14px; }
+  .fc-progress-fill { height: 100%; border-radius: 99px; }
+
+  .fc-alerts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .fc-alert-line { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-muted); }
+  .fc-alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .fc-alert-line.is-urgent { color: #b91c1c; font-weight: 500; }
+
+  .fc-action {
+    width: 100%; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700;
+    background: var(--navy); color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .filiere-card:hover .fc-action { background: var(--navy-light); }
+
+  /* Comparative table */
+  .compare-card {
     background: var(--surface); border-radius: var(--radius);
-    box-shadow: var(--shadow); border: 1px solid var(--border);
-    padding: 20px 22px;
-  }
-  .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .stat-icon {
-    width: 42px; height: 42px; border-radius: 11px;
-    display: flex; align-items: center; justify-content: center; font-size: 19px;
-  }
-  .stat-trend { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-  .trend-up { background: var(--green-light); color: #16a34a; }
-  .stat-value { font-size: 26px; font-weight: 800; color: var(--text); }
-  .stat-label { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
-
-  /* 3 PHASES - signature visuelle (Bleu / Orange / Jaune) */
-  .phases-card {
-    background: var(--surface); border-radius: var(--radius);
-    box-shadow: var(--shadow); border: 1px solid var(--border);
-    padding: 24px 26px; margin-bottom: 24px;
-  }
-  .phases-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-  .phases-title { font-size: 15px; font-weight: 700; color: var(--text); }
-  .phases-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
-
-  .phases-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
-  .phase-block {
-    border-radius: 12px; padding: 18px; position: relative; overflow: hidden;
-  }
-  .phase-bleu { background: linear-gradient(135deg, #eff6ff, #e0f0ff); border: 1.5px solid #bfdbfe; }
-  .phase-orange { background: linear-gradient(135deg, #fff7ed, #ffeede); border: 1.5px solid #fed7aa; }
-  .phase-jaune { background: linear-gradient(135deg, #fefce8, #fef9c3); border: 1.5px solid #fde68a; }
-
-  .phase-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 7px; }
-  .dot-bleu { background: #2563eb; }
-  .dot-orange { background: var(--orange); }
-  .dot-jaune { background: #ca8a04; }
-
-  .phase-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-  .label-bleu { color: #1d4ed8; }
-  .label-orange { color: #c2410c; }
-  .label-jaune { color: #a16207; }
-
-  .phase-name { font-size: 13.5px; font-weight: 600; color: var(--text); margin: 6px 0 14px; }
-  .phase-count { font-size: 28px; font-weight: 800; color: var(--text); }
-  .phase-total { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-  .phase-bar-wrap { background: rgba(255,255,255,0.6); border-radius: 99px; height: 7px; margin-top: 12px; overflow: hidden; }
-  .phase-bar-fill { height: 100%; border-radius: 99px; }
-  .fill-bleu { background: #2563eb; }
-  .fill-orange { background: var(--orange); }
-  .fill-jaune { background: #ca8a04; }
-
-  /* Grid */
-  .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 20px; }
-
-  .card {
-    background: var(--surface); border-radius: var(--radius);
-    box-shadow: var(--shadow); border: 1px solid var(--border);
-    overflow: hidden;
+    box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden;
   }
   .card-header {
-    padding: 18px 20px 14px;
+    padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid var(--border);
   }
   .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
-  .card-body { padding: 0; }
 
-  /* Table suivi étudiants */
-  .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
   thead th {
     text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 16px;
+    text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 20px;
     background: var(--bg); border-bottom: 1px solid var(--border);
   }
-  tbody td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  thead th.center { text-align: center; }
+  tbody td { padding: 13px 20px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  tbody td.center { text-align: center; }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #fafbfc; }
+  tbody tr:hover { background: #fafbfc; cursor: pointer; }
 
-  .student-cell { display: flex; align-items: center; gap: 10px; }
-  .student-avatar {
-    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: #fff;
-  }
-  .student-name { font-weight: 600; color: var(--text); font-size: 13px; }
-  .student-niveau { font-size: 11.5px; color: var(--text-muted); }
+  .filiere-name-cell { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .filiere-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
   .pill {
     display: inline-flex; align-items: center; gap: 5px;
@@ -238,115 +248,7 @@
   .pill::before { content: '●'; font-size: 7px; }
   .pill-green { background: var(--green-light); color: #16a34a; }
   .pill-orange { background: var(--orange-light); color: #ea580c; }
-  .pill-blue { background: var(--teal-light); color: #0369a1; }
-  .pill-red { background: #fef2f2; color: #dc2626; }
-  .pill-gray { background: #f1f5f9; color: #64748b; }
-
-  .encadrant-cell { font-size: 12.5px; }
-  .encadrant-acad { color: var(--text); font-weight: 500; }
-  .encadrant-entr { color: var(--text-muted); font-size: 11.5px; margin-top: 1px; }
-  .encadrant-missing { color: var(--orange); font-weight: 600; font-size: 12px; }
-
-  .btn-sm {
-    padding: 6px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600;
-    border: none; cursor: pointer; transition: all 0.15s; white-space: nowrap;
-  }
-  .btn-sm-primary { background: var(--navy); color: #fff; }
-  .btn-sm-orange { background: var(--orange-light); color: #ea580c; }
-  .btn-sm-teal { background: var(--teal-light); color: #0369a1; }
-
-  .table-footer {
-    padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid var(--border); background: var(--bg);
-  }
-  .table-footer-text { font-size: 12px; color: var(--text-muted); }
-  .filter-tabs { display: flex; gap: 6px; }
-  .filter-tab {
-    padding: 5px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600;
-    color: var(--text-muted); cursor: pointer; border: 1px solid var(--border);
-  }
-  .filter-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
-
-  /* Rapports hebdo - colonne droite, prioritaire */
-  .rapport-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 13px 20px; border-bottom: 1px solid var(--border);
-  }
-  .rapport-item:last-child { border-bottom: none; }
-  .rapport-unread-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0;
-  }
-  .rapport-read-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0;
-  }
-  .rapport-info { flex: 1; }
-  .rapport-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .rapport-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
-  .rapport-week-badge {
-    font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
-    background: var(--orange-light); color: #ea580c;
-  }
-
-  /* Séances à venir */
-  .seance-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 20px; border-bottom: 1px solid var(--border);
-  }
-  .seance-row:last-child { border-bottom: none; }
-  .seance-date-block {
-    width: 44px; text-align: center; flex-shrink: 0;
-  }
-  .seance-day { font-size: 16px; font-weight: 800; color: var(--navy); line-height: 1; }
-  .seance-month { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-  .seance-info { flex: 1; }
-  .seance-student { font-size: 12.5px; font-weight: 600; color: var(--text); }
-  .seance-detail { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-
-  .section-divider {
-    margin: 4px 0 16px; font-size: 11px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-
-  .empty-soutenance-note {
-    padding: 16px 20px; font-size: 12px; color: var(--text-muted);
-    background: var(--bg); border-radius: 10px; margin: 16px 20px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  /* Sélecteur de filière */
-  .filiere-select-wrap { position: relative; }
-  .filiere-select {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 14px; border-radius: 9px; background: var(--bg);
-    border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s;
-  }
-  .filiere-select:hover { border-color: var(--teal); }
-  .filiere-select-dot { width: 9px; height: 9px; border-radius: 3px; background: var(--teal); flex-shrink: 0; }
-  .filiere-select-text { font-size: 13px; font-weight: 700; color: var(--text); }
-  .filiere-select-sub { font-size: 10.5px; color: var(--text-muted); }
-  .filiere-select-chevron { font-size: 10px; color: var(--text-muted); margin-left: 4px; }
-
-  .filiere-dropdown {
-    position: absolute; top: calc(100% + 6px); left: 0; width: 280px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 20; overflow: hidden; display: none;
-  }
-  .filiere-dropdown.open { display: block; }
-  .fd-header { padding: 12px 16px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-  .fd-item {
-    display: flex; align-items: center; gap: 10px; padding: 11px 16px;
-    cursor: pointer; transition: background 0.1s;
-  }
-  .fd-item:hover { background: var(--bg); }
-  .fd-item.current { background: var(--teal-light); }
-  .fd-item-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-  .fd-item-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
-  .fd-item-meta { font-size: 11px; color: var(--text-muted); }
-  .fd-item-check { color: var(--teal); font-size: 13px; }
-  .fd-footer { padding: 10px 16px; border-top: 1px solid var(--border); }
-  .fd-global-link {
-    font-size: 12.5px; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: 6px;
-    cursor: pointer;
-  }
+  .pill-red { background: var(--red-light); color: #dc2626; }
 </style>
 </head>
 <body>
@@ -358,7 +260,7 @@
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjYzIDE2NSAxMDk4IDE0MTYiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwxNjQxLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIgZmlsbD0iIzFCM0Y3QSI+CjxwYXRoIGQ9Ik02NzUwIDE0NTA1IGMtNyAtOCAtMjcgLTE1IC00NSAtMTUgLTE4IDAgLTM4IC03IC00NSAtMTUgLTcgLTggLTIwCi0xNSAtMjkgLTE1IC05IDAgLTM0IC0xNyAtNTQgLTM4IC00MCAtNDEgLTUwIC04OSAtMjIgLTExMiA4IC03IDE1IC0yMyAxNQotMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDExIC00IDE1IC0yMiAxNSAtNjkgMCAtNDUgNSAtNjggMTUgLTc3IDggLTcgMTUgLTIzCjE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNQotMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03CjE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDkgLTMgMTUgLTE4IDE1IC0zOSAwIC0xOSA3IC00MCAxNSAtNDcgOCAtNwoxNSAtMjcgMTUgLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03IDE1IC0yNyAxNSAtNDUgMCAtMTggNyAtMzggMTUgLTQ1IDggLTcKMTUgLTI3IDE1IC00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNyAxNSAtMjcgMTUgLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03CjE1IC0yNyAxNSAtNDUgMCAtMTggNyAtMzggMTUgLTQ1IDggLTcgMTUgLTI3IDE1IC00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNwoxNSAtMjcgMTUgLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDExCi00IDE1IC0yMCAxNSAtNTQgMCAtMzIgNSAtNTQgMTUgLTYyIDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkKMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1Ci0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUKMTUgLTI5IDExIC00IDE1IC0yMCAxNSAtNTQgMCAtMzIgNSAtNTQgMTUgLTYyIDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3Ci0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzCjcgLTI1IDE1IC0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03IDE1IC0yMyAxNSAtMzUgMAotMTMgNyAtMjUgMTUgLTI5IDExIC00IDE1IC0yMCAxNSAtNTQgMCAtMzIgNSAtNTQgMTUgLTYyIDggLTcgMTUgLTIzIDE1IC0zNQowIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUKLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03IDE1IC0yMwoxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDggLTMgMTUgLTE2IDE1IC0yOCAxIC0yNiA0MiAtNjEgNjggLTU2IDkgMiAxOCAxMwoyMCAyNSAyIDEyIDEwIDI3IDE4IDMzIDggNyAxNCAyNyAxNCA0NSAwIDE4IDcgMzggMTUgNDUgOCA3IDE1IDI3IDE1IDQ1IDAgMTgKNyAzOCAxNSA0NSA4IDcgMTUgMjcgMTUgNDUgMCAxOCA3IDM4IDE1IDQ1IDggNyAxNSAyNyAxNSA0NSAwIDE4IDcgMzggMTUgNDUKOCA3IDE1IDI3IDE1IDQ1IDAgMTggNyAzOCAxNSA0NSA4IDcgMTUgMjcgMTUgNDUgMCAxOCA3IDM4IDE1IDQ1IDggNyAxNSAyOAoxNSA0NyAwIDIxIDYgMzYgMTUgMzkgOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMCA4IDE1IDMwIDE1IDYyIDAgMzQKNCA1MCAxNSA1NCA4IDQgMTUgMTYgMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDEwIDggMTUgMzAgMTUgNjIgMCAzNCA0IDUwIDE1IDU0CjggNCAxNSAxNiAxNSAyOSAwIDEyIDcgMjggMTUgMzUgMTAgOCAxNSAzMCAxNSA2MiAwIDM0IDQgNTAgMTUgNTQgOCA0IDE1IDE2CjE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMCA4IDE1IDMwIDE1IDYyIDAgMzQgNCA1MCAxNSA1NCA4IDQgMTUgMTYgMTUgMjkgMCAxMgo3IDI4IDE1IDM1IDEwIDggMTUgMzAgMTUgNjIgMCAzNCA0IDUwIDE1IDU0IDggNCAxNSAxNiAxNSAyOSAwIDEyIDcgMjggMTUgMzUKMTAgOCAxNSAzMCAxNSA2MiAwIDM0IDQgNTAgMTUgNTQgOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMCA4IDE1IDMwCjE1IDYyIDAgMzQgNCA1MCAxNSA1NCA4IDQgMTUgMTYgMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDEwIDggMTUgMzAgMTUgNjIgMCAzNAo0IDUwIDE1IDU0IDggNCAxNSAxNiAxNSAyOSAwIDEyIDcgMjggMTUgMzUgMTAgOCAxNSAzMCAxNSA2MiAwIDM0IDQgNTAgMTUgNTQKOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMCA4IDE1IDMwIDE1IDYyIDAgMzQgNCA1MCAxNSA1NCA4IDQgMTUgMTYKMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDEwIDggMTUgMzAgMTUgNjIgMCAzNCA0IDUwIDE1IDU0IDggNCAxNSAxNiAxNSAyOSAwIDEyCjcgMjggMTUgMzUgOCA3IDE1IDI3IDE1IDQ1IDAgMTggNyAzOCAxNSA0NSAxMCA4IDE1IDMwIDE1IDYyIDAgMzQgNCA1MCAxNSA1NAo4IDQgMTUgMTYgMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDEyIDEwIDE1IDM3IDE1IDExOSAwIDk5IC0yIDEwOSAtMjMgMTI5IC0xMwoxMiAtMzAgMjIgLTM5IDIyIC05IDAgLTIxIDcgLTI4IDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUKLTExIDEzIC0xMjMgMTUgLTkwMCAxNSAtNzc3IDAgLTg4OSAtMiAtOTAwIC0xNXogTTU3MTUgMTQzNzAgYy0xNiAtMTYgLTM2Ci0zMCAtNDUgLTMwIC05IDAgLTI5IC0xMyAtNDUgLTMwIC0xNiAtMTYgLTM5IC0zMCAtNTIgLTMwIC0xOSAwIC0yMyAtNSAtMjMKLTMwIDAgLTI1IC00IC0zMCAtMjMgLTMwIC0xMyAwIC0zNiAtMTMgLTUyIC0zMCAtMTYgLTE2IC0zNiAtMzAgLTQ1IC0zMCAtOCAwCi00MiAtMjcgLTc1IC02MCAtMzMgLTMzIC02NiAtNjAgLTc1IC02MCAtOSAwIC00MiAtMjcgLTc1IC02MCAtMzMgLTMzIC02NgotNjAgLTc1IC02MCAtOSAwIC0zNiAtMjAgLTYwIC00NSAtMjcgLTI3IC01MyAtNDUgLTY3IC00NSAtMTkgMCAtMjMgLTUgLTIzCi0zMCAwIC0yNSAtNCAtMzAgLTIzIC0zMCAtMTMgMCAtMzYgLTEzIC01MiAtMzAgLTE2IC0xNiAtMzYgLTMwIC00NSAtMzAgLTggMAotNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjYgLTYwIC03NSAtNjAgLTkgMCAtNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjYKLTYwIC03NSAtNjAgLTkgMCAtNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjYgLTYwIC03NSAtNjAgLTkgMCAtNDIgLTI3IC03NQotNjAgLTMzIC0zMyAtNjYgLTYwIC03NSAtNjAgLTkgMCAtMzYgLTIwIC02MCAtNDUgLTI0IC0yNSAtNTEgLTQ1IC02MCAtNDUKLTIxIDAgLTIxMCAtMTkxIC0yMTAgLTIxMyAwIC0xMCAtNyAtMjAgLTE1IC0yMyAtOCAtNCAtMTUgLTE2IC0xNSAtMjkgMCAtMTIKLTcgLTI4IC0xNSAtMzUgLTIyIC0xOCAtMjIgLTI1MiAwIC0yNzAgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1Ci0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUKMTUgLTI5IDEwIC00IDE1IC0yMCAxNSAtNTQgMCAtNDEgNSAtNTMgMzAgLTc3IDI3IC0yNiAzMCAtMzUgMzAgLTkwIDAgLTU1IDMKLTY0IDMwIC05MCAyNyAtMjYgMzAgLTM1IDMwIC05MCAwIC01NSAzIC02NCAzMCAtOTAgMjUgLTI0IDMwIC0zNyAzMCAtNzYgMAotMjkgNiAtNTEgMTUgLTU5IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NAowIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSA5IC0zIDE1IC0xOCAxNSAtMzkKMCAtMTkgNyAtNDAgMTUgLTQ3IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1Ci01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSA5IC0zIDE1IC0xOCAxNQotMzkgMCAtMTkgNyAtNDAgMTUgLTQ3IDggLTcgMTUgLTI3IDE1IC00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNyAxNSAtMjcgMTUKLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03IDE1IC0yNyAxNSAtNDUgMCAtMTggNyAtMzggMTUgLTQ1IDggLTcgMTUgLTI3IDE1Ci00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNyAxNSAtMjcgMTUgLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03IDE1IC0yMyAxNQotMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDExIC00IDE1IC0yMCAxNSAtNTQgMCAtMzIgNSAtNTQgMTUgLTYyIDggLTcgMTUgLTIzCjE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTAgLTQgMTUgLTIwIDE1IC01NCAwIC00MSA1IC01MyAzMCAtNzcgMjUgLTI0IDMwCi0zNyAzMCAtNzYgMCAtMjkgNiAtNTEgMTUgLTU5IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQKMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSAxMAotNCAxNSAtMjAgMTUgLTU0IDAgLTQxIDUgLTUzIDMwIC03NyAyNiAtMjUgMzAgLTM2IDMwIC04MiAwIC01MiAwIC01MyAzMCAtNTMKMjcgMCAzMCAtMyAzMCAtMzAgbDAgLTMwIDgzIDAgYzc5IDAgODUgMSAxMTIgMzAgMTYgMTcgMzYgMzAgNDUgMzAgOCAwIDQyIDI3Cjc1IDYwIDMzIDMzIDY3IDYwIDc1IDYwIDkgMCAyOSAxNCA0NSAzMCAxNiAxNyAzOSAzMCA1MiAzMCAxOSAwIDIzIDUgMjMgMzAgMAoyNSA0IDMwIDIzIDMwIDEzIDAgMzYgMTQgNTIgMzAgMTYgMTcgMzkgMzAgNTIgMzAgMTkgMCAyMyA1IDIzIDMwIDAgMjUgNCAzMAoyMyAzMCAxNCAwIDQwIDE4IDY3IDQ1IDI0IDI1IDUxIDQ1IDYwIDQ1IDkgMCAzNiAyMCA2MCA0NSAyNCAyNSA1MSA0NSA2MCA0NQo4IDAgNDkgMzQgOTAgNzUgNDEgNDEgODIgNzUgOTAgNzUgOSAwIDI5IDE0IDQ1IDMwIDE2IDE3IDM5IDMwIDUyIDMwIDE5IDAgMjMKNSAyMyAzMCAwIDI1IDQgMzAgMjMgMzAgMTMgMCAzNiAxNCA1MiAzMCAxNiAxNyAzNiAzMCA0NSAzMCA4IDAgNDIgMjcgNzUgNjAKMzggMzggNjggNjAgODIgNjAgMTkgMCAyMyA1IDIzIDMwIDAgMjUgNCAzMCAyMyAzMCAxNCAwIDQwIDE4IDY3IDQ1IDI0IDI1IDUxCjQ1IDYwIDQ1IDkgMCAzNiAyMCA2MCA0NSAyNCAyNSA1MSA0NSA2MCA0NSAyMSAwIDE4MCAxNjEgMTgwIDE4MyAwIDEwIDcgMjAKMTUgMjMgOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMSA5IDE1IDM1IDE1IDEwNSAwIDcwIC00IDk2IC0xNSAxMDUKLTkgOCAtMTUgMzAgLTE1IDYwIDAgMzAgLTYgNTIgLTE1IDYwIC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1IC0xNSAyOQotMTEgNCAtMTUgMjAgLTE1IDU0IDAgMzIgLTUgNTQgLTE1IDYyIC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1IC0xNSAyOQotOSAzIC0xNSAxOCAtMTUgMzkgMCAxOSAtNyA0MCAtMTUgNDcgLTggNyAtMTUgMjcgLTE1IDQ1IDAgMTggLTcgMzggLTE1IDQ1Ci04IDcgLTE1IDI3IC0xNSA0NSAwIDE4IC03IDM4IC0xNSA0NSAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUgMjkKLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUgMjkKLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUgMjkKLTEwIDQgLTE1IDIwIC0xNSA1NCAwIDQxIC01IDUzIC0zMCA3NyAtMjcgMjYgLTMwIDM1IC0zMCA5MCAwIDU1IC0zIDY0IC0zMAo5MCAtMjUgMjQgLTMwIDM3IC0zMCA3NiAwIDI5IC02IDUxIC0xNSA1OSAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTEwIDQgLTE1IDIwIC0xNSA1NCAwIDQxIC01IDUzIC0zMCA3NyAtMjUgMjQgLTMwIDM3IC0zMCA3NiAwIDI5IC02IDUxCi0xNSA1OSAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUgMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0Ci0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUgMjkgLTkgMyAtMTUgMTggLTE1IDM5IDAgMTkgLTcgNDAKLTE1IDQ3IC04IDcgLTE1IDI3IC0xNSA0NSAwIDE4IC03IDM4IC0xNSA0NSAtOCA3IC0xNSAyNyAtMTUgNDUgMCAxOCAtNyAzOAotMTUgNDUgLTggNyAtMTUgMjcgLTE1IDQ1IDAgMTggLTcgMzggLTE1IDQ1IC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1Ci0xNSAyOSAtMTEgNCAtMTUgMjAgLTE1IDU0IDAgMzIgLTUgNTQgLTE1IDYyIC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1Ci0xNSAyOSAtOSAzIC0xNSAxOCAtMTUgMzkgMCAxOSAtNyA0MCAtMTUgNDcgLTggNyAtMTUgMjMgLTE1IDM1IDAgMTMgLTcgMjUKLTE1IDI5IC04IDMgLTE1IDE0IC0xNSAyNCAwIDEwIC0xNyAzNSAtMzggNTUgLTM1IDM0IC00MiAzNyAtOTggMzcgLTU0IDAgLTYzCi0zIC04OSAtMzB6IE04NzAgMTI2NDUgYy03IC04IC0yMyAtMTUgLTM2IC0xNSAtMTkgMCAtMjQgLTUgLTI0IC0yNCAwIC0xMyAtNwotMjkgLTE1IC0zNiAtOSAtOCAtMTUgLTMwIC0xNSAtNjAgMCAtMzAgNiAtNTIgMTUgLTYwIDEwIC05IDE1IC0zMiAxNSAtNzQgMAotNTYgMyAtNjUgMzAgLTkxIDI3IC0yNiAzMCAtMzUgMzAgLTkwIDAgLTU1IDMgLTY0IDMwIC05MCAyNyAtMjYgMzAgLTM1IDMwCi05MCAwIC01NSAzIC02NCAzMCAtOTAgMjUgLTI0IDMwIC0zNyAzMCAtNzYgMCAtMjkgNiAtNTEgMTUgLTU5IDggLTcgMTUgLTIzCjE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNQotMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSA5IC0zIDE1IC0xOCAxNSAtMzkgMCAtMTkgNyAtNDAgMTUgLTQ3IDggLTcgMTUKLTI3IDE1IC00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNyAxNSAtMjcgMTUgLTQ1IDAgLTE4IDcgLTM4IDE1IC00NSA4IC03IDE1Ci0yNyAxNSAtNDUgMCAtMTggNyAtMzggMTUgLTQ1IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQKMTUgLTIwIDE1IC01NCAwIC0zMiA1IC01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSAxMQotNCAxNSAtMjAgMTUgLTU0IDAgLTMyIDUgLTU0IDE1IC02MiA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5CjEwIC00IDE1IC0yMCAxNSAtNTQgMCAtNDEgNSAtNTMgMzAgLTc3IDI1IC0yNCAzMCAtMzcgMzAgLTc2IDAgLTI5IDYgLTUxIDE1Ci01OSA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDExIC00IDE1IC0yMCAxNSAtNTQgMCAtMzIgNSAtNTQKMTUgLTYyIDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgMTEgLTQgMTUgLTIwIDE1IC01NCAwIC0zMiA1Ci01NCAxNSAtNjIgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSAxMSAtNCAxNSAtMjAgMTUgLTU0IDAgLTMyCjUgLTU0IDE1IC02MiA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDEwIC00IDE1IC0yMCAxNSAtNTQgMAotNDEgNSAtNTMgMzAgLTc3IDI3IC0yNiAzMCAtMzUgMzAgLTkwIDAgLTU1IDMgLTY0IDMwIC05MCAyNSAtMjQgMzAgLTM3IDMwCi03NSAwIC0zOCA1IC01MSAzMCAtNzUgMTcgLTE2IDMwIC0zNiAzMCAtNDUgMCAtMjAgNzEgLTkwIDkyIC05MCA4IDAgMjEgLTcKMjggLTE1IDcgLTggMjAgLTE1IDMwIC0xNSAxMCAwIDIzIC03IDMwIC0xNSA5IC0xMCAzMiAtMTUgNzUgLTE1IDQzIDAgNjYgLTUKNzUgLTE1IDExIC0xMyAxMzUgLTE1IDEwMDUgLTE1IDg3MCAwIDk5NCAyIDEwMDUgMTUgOSAxMSAzMyAxNSA4OSAxNSA3NiAwIDc3CjEgMTE0IDM4IGwzNyAzOCAwIDkxIGMwIDY4IC00IDk0IC0xNSAxMDMgLTggNyAtMTUgMjcgLTE1IDQ1IDAgMTggLTcgMzggLTE1CjQ1IC04IDcgLTE1IDI3IC0xNSA0NSAwIDE4IC03IDM4IC0xNSA0NSAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNSAtMTUKMjkgLTEwIDQgLTE1IDIwIC0xNSA1NCAwIDQxIC01IDUzIC0zMCA3NyAtMjcgMjYgLTMwIDM1IC0zMCA5MCAwIDU1IC0zIDY0Ci0zMCA5MCAtMjUgMjQgLTMwIDM3IC0zMCA3NiAwIDI5IC02IDUxIC0xNSA1OSAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNQotMTUgMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNQotMTUgMjkgLTExIDQgLTE1IDIwIC0xNSA1NCAwIDMyIC01IDU0IC0xNSA2MiAtOCA3IC0xNSAyMyAtMTUgMzUgMCAxMyAtNyAyNQotMTUgMjkgLTkgMyAtMTUgMTggLTE1IDM5IDAgMTkgLTcgNDAgLTE1IDQ3IC04IDcgLTE1IDI3IC0xNSA0NSAwIDE4IC03IDM4Ci0xNSA0NSAtOCA3IC0xNSAyNyAtMTUgNDUgMCAxOCAtNyAzOCAtMTUgNDUgLTggNyAtMTUgMjcgLTE1IDQ1IDAgMTggLTcgMzgKLTE1IDQ1IC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1IC0xNSAyOSAtMTEgNCAtMTUgMjAgLTE1IDU0IDAgMzIgLTUgNTQKLTE1IDYyIC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1IC0xNSAyOSAtMTEgNCAtMTUgMjAgLTE1IDU0IDAgMzIgLTUgNTQKLTE1IDYyIC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1IC0xNSAyOSAtMTAgNCAtMTUgMjAgLTE1IDU0IDAgNDEgLTUgNTMKLTMwIDc3IC0yNSAyNCAtMzAgMzcgLTMwIDc2IDAgMjkgLTYgNTEgLTE1IDU5IC04IDcgLTE1IDIzIC0xNSAzNSAwIDEzIC03IDI1Ci0xNSAyOSAtOCAzIC0xNSAxNCAtMTUgMjQgMCAyMSAtOTkgMTIyIC0xMjEgMTIyIC04IDAgLTI4IDE0IC00NCAzMCBsLTI5IDMwCi0xMTU3IDAgYy0xMDE2IDAgLTExNTggLTIgLTExNjkgLTE1eiBNNzI0NSAxMDMyMCBjLTE2IC0xNiAtMzYgLTMwIC00NSAtMzAKLTggMCAtNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjYgLTYwIC03NSAtNjAgLTkgMCAtMzYgLTIwIC02MCAtNDUgLTI0IC0yNQotNTEgLTQ1IC02MCAtNDUgLTkgMCAtNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjcgLTYwIC03NSAtNjAgLTkgMCAtMjkgLTEzCi00NSAtMzAgLTE2IC0xNiAtMzYgLTMwIC00NSAtMzAgLTggMCAtNDIgLTI3IC03NSAtNjAgLTMzIC0zMyAtNjcgLTYwIC03NQotNjAgLTkgMCAtMjkgLTEzIC00NSAtMzAgLTE2IC0xNiAtMzkgLTMwIC01MiAtMzAgLTE5IDAgLTIzIC01IC0yMyAtMzAgMCAtMjUKLTQgLTMwIC0yMyAtMzAgLTEzIDAgLTM2IC0xMyAtNTIgLTMwIC0xNiAtMTYgLTM2IC0zMCAtNDUgLTMwIC04IDAgLTQyIC0yNwotNzUgLTYwIC0zMyAtMzMgLTY2IC02MCAtNzUgLTYwIC05IDAgLTM2IC0yMCAtNjAgLTQ1IC0yNCAtMjUgLTUxIC00NSAtNjAKLTQ1IC05IDAgLTM2IC0yMCAtNjAgLTQ1IC0yNCAtMjUgLTUxIC00NSAtNjAgLTQ1IC05IDAgLTM2IC0yMCAtNjAgLTQ1IC0yNAotMjUgLTUxIC00NSAtNjAgLTQ1IC05IDAgLTI5IC0xMyAtNDUgLTMwIC0xNiAtMTYgLTM5IC0zMCAtNTIgLTMwIC0xOSAwIC0yMwotNSAtMjMgLTMwIDAgLTI1IC00IC0zMCAtMjMgLTMwIC0xMyAwIC0zNiAtMTMgLTUyIC0zMCAtMTYgLTE2IC0zNiAtMzAgLTQ1Ci0zMCAtOCAwIC00MiAtMjcgLTc1IC02MCAtMzMgLTMzIC02NiAtNjAgLTc1IC02MCAtOSAwIC00MiAtMjcgLTc1IC02MCAtMzMKLTMzIC02NyAtNjAgLTc1IC02MCAtOSAwIC0yOSAtMTMgLTQ1IC0zMCAtMTYgLTE2IC0zNiAtMzAgLTQ1IC0zMCAtOSAwIC0yOQotMTMgLTQ1IC0zMCAtMTYgLTE2IC0zNiAtMzAgLTQ2IC0zMCAtOSAwIC0yMiAtNyAtMjkgLTE1IC03IC04IC0yMCAtMTUgLTMwCi0xNSAtMTAgMCAtMjMgLTcgLTMwIC0xNSAtNyAtOCAtMjAgLTE1IC0zMCAtMTUgLTEwIDAgLTIzIC03IC0zMCAtMTUgLTcgLTgKLTI3IC0xNSAtNDUgLTE1IC0xOCAwIC0zOCAtNyAtNDUgLTE1IC04IC05IC0zMCAtMTUgLTYwIC0xNSAtMzAgMCAtNTIgLTYgLTYwCi0xNSAtMTEgLTEzIC0xNzUgLTE1IC0xMzM5IC0xNyBsLTEzMjYgLTMgLTMgLTY3IGMtMiAtNDMgLTggLTcxIC0xNyAtNzggLTExCi05IC0xNSAtMzYgLTE1IC0xMDUgMCAtNzAgLTQgLTk2IC0xNSAtMTA1IC0xMiAtMTAgLTE1IC0zNyAtMTUgLTEyMCAwIC04MyAtMwotMTEwIC0xNSAtMTIwIC0xMSAtOSAtMTUgLTMzIC0xNSAtOTAgMCAtNTcgLTQgLTgxIC0xNSAtOTAgLTEyIC0xMCAtMTUgLTM4Ci0xNSAtMTM1IDAgLTk3IC0zIC0xMjUgLTE1IC0xMzUgLTExIC05IC0xNSAtMzMgLTE1IC05MCAwIC01NyAtNCAtODEgLTE1IC05MAotMTIgLTEwIC0xNSAtNDAgLTE1IC0xNTAgMCAtMTEwIC0zIC0xNDAgLTE1IC0xNTAgLTkgLTggLTE1IC0zMCAtMTUgLTYwIDAKLTMwIC02IC01MiAtMTUgLTYwIC0xMiAtMTAgLTE1IC00MiAtMTUgLTE2NSAwIC0xMjMgLTMgLTE1NSAtMTUgLTE2NSAtOSAtOAotMTUgLTMwIC0xNSAtNjAgMCAtMzAgLTYgLTUyIC0xNSAtNjAgLTEyIC0xMCAtMTUgLTQyIC0xNSAtMTY1IDAgLTEyMyAtMwotMTU1IC0xNSAtMTY1IC05IC04IC0xNSAtMzAgLTE1IC02MCAwIC0zMCAtNiAtNTIgLTE1IC02MCAtMTIgLTEwIC0xNSAtNDMKLTE1IC0xODAgMCAtMTM3IC0zIC0xNzAgLTE1IC0xODAgLTggLTcgLTE1IC0yNyAtMTUgLTQ1IDAgLTE4IC03IC0zOCAtMTUgLTQ1Ci0xMiAtMTAgLTE1IC00MyAtMTUgLTE4MCAwIC0xMzcgLTMgLTE3MCAtMTUgLTE4MCAtOCAtNyAtMTUgLTI3IC0xNSAtNDUgMAotMTggLTcgLTM4IC0xNSAtNDUgLTEyIC0xMCAtMTUgLTQzIC0xNSAtMTgwIDAgLTEzNyAtMyAtMTcwIC0xNSAtMTgwIC05IC04Ci0xNSAtMzAgLTE1IC02MCAwIC0zMCAtNiAtNTIgLTE1IC02MCAtMTIgLTEwIC0xNSAtNDIgLTE1IC0xNjUgMCAtMTIzIC0zCi0xNTUgLTE1IC0xNjUgLTkgLTggLTE1IC0zMCAtMTUgLTYwIDAgLTMwIC02IC01MiAtMTUgLTYwIC0xMiAtMTAgLTE1IC00MgotMTUgLTE2NSAwIC0xMjMgLTMgLTE1NSAtMTUgLTE2NSAtMTAgLTkgLTE1IC0zMiAtMTUgLTc1IDAgLTQzIC01IC02NiAtMTUKLTc1IC0xMiAtMTAgLTE1IC00MCAtMTUgLTE1MCAwIC0xMTAgLTMgLTE0MCAtMTUgLTE1MCAtMTAgLTkgLTE1IC0zMiAtMTUgLTc1CjAgLTQzIC01IC02NiAtMTUgLTc1IC0xMiAtMTAgLTE1IC00MCAtMTUgLTE1MCAwIC0xMTAgLTMgLTE0MCAtMTUgLTE1MCAtMTEKLTkgLTE1IC0zMyAtMTUgLTkwIDAgLTU3IC00IC04MSAtMTUgLTkwIC0xMiAtMTAgLTE1IC0zOCAtMTUgLTEzNSAwIC05NyAtMwotMTI1IC0xNSAtMTM1IC0xMSAtOSAtMTUgLTM1IC0xNSAtMTA1IDAgLTcwIC00IC05NiAtMTUgLTEwNSAtMTEgLTkgLTE1IC0zNQotMTUgLTEwNSAwIC03MCAtNCAtOTYgLTE1IC0xMDUgLTEyIC0xMCAtMTUgLTM3IC0xNSAtMTE5IDAgLTk5IDIgLTEwOSAyMwotMTI5IDIwIC0xOSAzNSAtMjIgMTE0IC0yMiA2OCAwIDk0IDQgMTAzIDE1IDggOSAzMCAxNSA2MCAxNSAzMCAwIDUyIDYgNjAgMTUKOSAxMCAzMiAxNSA3NSAxNSA0MyAwIDY2IDUgNzUgMTUgOCA5IDMwIDE1IDYwIDE1IDMwIDAgNTIgNiA2MCAxNSA5IDEwIDMyIDE1Cjc1IDE1IDQzIDAgNjYgNSA3NSAxNSA3IDggMjcgMTUgNDUgMTUgMTggMCAzOCA3IDQ1IDE1IDkgMTEgMzMgMTUgOTAgMTUgNTcgMAo4MSA0IDkwIDE1IDcgOCAyNyAxNSA0NSAxNSAxOCAwIDM4IDcgNDUgMTUgOSAxMSAzMyAxNSA5MCAxNSA1NyAwIDgxIDQgOTAgMTUKNyA4IDI3IDE1IDQ1IDE1IDE4IDAgMzggNyA0NSAxNSA5IDEwIDMyIDE1IDc0IDE1IDU2IDAgNjUgMyA5MSAzMCAxNiAxNyAzNgozMCA0NSAzMCAyMCAwIDkwIDcxIDkwIDkyIDAgOCA3IDIxIDE1IDI4IDEyIDEwIDE1IDM3IDE1IDEyMCAwIDgzIDMgMTEwIDE1CjEyMCAxMiAxMCAxNSA0MiAxNSAxNjUgMCAxMjMgMyAxNTUgMTUgMTY1IDEyIDEwIDE1IDQ3IDE1IDIxMCAwIDE2MyAzIDIwMCAxNQoyMTAgMTIgMTAgMTUgMzggMTUgMTM1IDAgOTcgMyAxMjUgMTUgMTM1IDEzIDEwIDE1IDUwIDE1IDI0MCAwIDE5MCAyIDIzMCAxNQoyNDAgMTIgMTAgMTUgMzcgMTUgMTIwIDAgODMgMyAxMTAgMTUgMTIwIDEzIDEwIDE1IDUzIDE1IDI3MCAwIDIxNyAyIDI2MCAxNQoyNzAgMTEgOSAxNSAzNSAxNSAxMDUgMCA3MCA0IDk2IDE1IDEwNSAxMyAxMCAxNSA1MyAxNSAyNzAgMCAyMTcgMiAyNjAgMTUKMjcwIDExIDkgMTUgMzMgMTUgOTAgMCA1NyA0IDgxIDE1IDkwIDEzIDEwIDE1IDUzIDE1IDI3MCAwIDIxNyAyIDI2MCAxNSAyNzAKMTAgOSAxNSAzMiAxNSA3NSAwIDQzIDUgNjYgMTUgNzUgMTIgMTAgMTUgNDAgMTUgMTQ5IGwwIDEzNyAzOCAzNyAzOCAzNyA4NzEKMCBjNzYyIDAgODcyIDIgODgzIDE1IDcgOCAyNyAxNSA0NSAxNSAxOCAwIDM4IDcgNDUgMTUgOCA5IDMwIDE1IDYwIDE1IDMwIDAKNTIgNiA2MCAxNSA3IDggMjAgMTUgMzAgMTUgMTAgMCAyMyA3IDMwIDE1IDcgOCAyMCAxNSAzMCAxNSAxMCAwIDIzIDcgMzAgMTUKNyA4IDIwIDE1IDMwIDE1IDEwIDAgMjMgNyAzMCAxNSA3IDggMjAgMTUgMjkgMTUgMjYgMCAyNDEgMjIxIDI0MSAyNDggMCAxOCA2CjIyIDMwIDIyIDI1IDAgMzAgNCAzMCAyNSAwIDE0IDcgMjggMTUgMzEgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMCA4CjQgMTUgMTcgMTUgMzAgMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNyAxNSAzMCAwIDE0IDcgMjcgMTUgMzAgOCA0IDE1IDE3IDE1CjMwIDAgMTQgNyAyNyAxNSAzMCA4IDQgMTUgMTcgMTUgMzAgMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNyAxNSAzMCAwIDE0IDcKMjcgMTUgMzAgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMCA4IDQgMTUgMTcgMTUgMzAgMCAxNCA3IDI3IDE1IDMwIDgKNCAxNSAxNiAxNSAyOSAwIDEyIDcgMjggMTUgMzUgOCA3IDE1IDI4IDE1IDQ3IDAgMjEgNiAzNiAxNSAzOSA4IDQgMTUgMTcgMTUKMzAgMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNyAxNSAzMCAwIDE0IDcgMjcgMTUgMzAgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNwoyNyAxNSAzMCA4IDQgMTUgMTcgMTUgMzAgMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNyAxNSAzMCAwIDE0IDcgMjcgMTUgMzAgOAo0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMCA4IDQgMTUgMTYgMTUgMjggMCAxMiAxNCAzNSAzMCA1MSAyMSAyMCAzMCAzOAozMCA2MCAwIDIyIDkgNDAgMzAgNjAgMjEgMjAgMzAgMzggMzAgNjAgMCAyMiA5IDQwIDMwIDYwIDIxIDIwIDMwIDM4IDMwIDYwIDAKMjIgOSA0MCAzMCA2MCAyNSAyNCAzMCAzNyAzMCA3NSAwIDM4IDUgNTEgMzAgNzUgMjEgMjAgMzAgMzggMzAgNjAgMCAyMiA5IDQwCjMwIDYwIDIxIDIwIDMwIDM4IDMwIDYwIDAgMjIgOSA0MCAzMCA2MCAyMSAyMCAzMCAzOCAzMCA2MCAwIDIyIDkgNDAgMzAgNjAKMjEgMjAgMzAgMzggMzAgNjAgMCAyMiA5IDQwIDMwIDYwIDIxIDIwIDMwIDM4IDMwIDYwIDAgMjIgOSA0MCAzMCA2MCAyMiAyMQozMCAzOCAzMCA2MiAwIDIxIDYgMzYgMTUgMzkgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMCA4IDQgMTUgMTcgMTUgMzAKMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNiAxNSAyOCAwIDEyIDE0IDM1IDMwIDUxIDIxIDIwIDMwIDM4IDMwIDYwIDAgMjIgOQo0MCAzMCA2MCAyMiAyMSAzMCAzOCAzMCA2MiAwIDIxIDYgMzYgMTUgMzkgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMAo4IDQgMTUgMTcgMTUgMzAgMCAxNCA3IDI3IDE1IDMwIDggNCAxNSAxNyAxNSAzMCAwIDE0IDcgMjcgMTUgMzAgOCA0IDE1IDE2CjE1IDI4IDAgMTIgMTQgMzUgMzAgNTEgMjIgMjEgMzAgMzggMzAgNjIgMCAyMSA2IDM2IDE1IDM5IDMxIDEyIDE2IDM0IC0yMyAzNAotMjkgMCAtNDUgLTcgLTY3IC0zMHogTTY5NjAgODg1NiBjMCAtMTMgLTcgLTI5IC0xNSAtMzYgLTggLTcgLTE1IC0yNyAtMTUKLTQ1IDAgLTE4IC03IC0zOCAtMTUgLTQ1IC04IC03IC0xNSAtMjcgLTE1IC00NSAwIC0xOCAtNyAtMzggLTE1IC00NSAtOCAtNwotMTUgLTIzIC0xNSAtMzUgMCAtMTMgLTcgLTI1IC0xNSAtMjkgLTkgLTMgLTE1IC0xOSAtMTUgLTQxIDAgLTIyIC02IC0zOCAtMTUKLTQxIC04IC00IC0xNSAtMTYgLTE1IC0yOSAwIC0xMiAtNyAtMjggLTE1IC0zNSAtOCAtNyAtMTUgLTI4IC0xNSAtNDcgMCAtMjEKLTYgLTM2IC0xNSAtMzkgLTggLTQgLTE1IC0xNiAtMTUgLTI5IDAgLTEyIC03IC0yOCAtMTUgLTM1IC0xMCAtOCAtMTUgLTMwCi0xNSAtNjIgMCAtMzQgLTQgLTUwIC0xNSAtNTQgLTggLTQgLTE1IC0xNiAtMTUgLTI5IDAgLTEyIC03IC0yOCAtMTUgLTM1IC04Ci03IC0xNSAtMjggLTE1IC00NyAwIC0yMSAtNiAtMzYgLTE1IC0zOSAtOCAtNCAtMTUgLTE2IC0xNSAtMjkgMCAtMTIgLTcgLTI4Ci0xNSAtMzUgLTkgLTggLTE1IC0zMCAtMTUgLTU5IDAgLTM5IC01IC01MiAtMzAgLTc2IC0yNSAtMjQgLTMwIC0zNiAtMzAgLTc3CjAgLTM0IC01IC01MCAtMTUgLTU0IC04IC00IC0xNSAtMTYgLTE1IC0yOSAwIC0xMiAtNyAtMjggLTE1IC0zNSAtOSAtOCAtMTUKLTMwIC0xNSAtNTkgMCAtMzkgLTUgLTUyIC0zMCAtNzYgLTI1IC0yNCAtMzAgLTM2IC0zMCAtNzcgMCAtMzQgLTUgLTUwIC0xNQotNTQgLTggLTQgLTE1IC0xNiAtMTUgLTI5IDAgLTEyIC03IC0yOCAtMTUgLTM1IC05IC04IC0xNSAtMzAgLTE1IC01OSAwIC0zOQotNSAtNTIgLTMwIC03NiAtMjUgLTI0IC0zMCAtMzYgLTMwIC03NyAwIC0zNCAtNSAtNTAgLTE1IC01NCAtOCAtNCAtMTUgLTE2Ci0xNSAtMjkgMCAtMTIgLTcgLTI4IC0xNSAtMzUgLTggLTcgLTE1IC0yNyAtMTUgLTQ1IDAgLTE4IC03IC0zOCAtMTUgLTQ1IC04Ci03IC0xNSAtMjcgLTE1IC00NSAwIC0xOCAtNyAtMzggLTE1IC00NSAtOSAtNyAtMTUgLTI5IC0xNSAtNTEgMCAtMzQgMyAtMzkKMjQgLTM5IDEzIDAgMjkgLTcgMzYgLTE1IDcgLTggMjAgLTE1IDMwIC0xNSAxMCAwIDIzIC03IDMwIC0xNSA4IC05IDMwIC0xNQo1OSAtMTUgNjQgMCA5MSAyOCA5MSA5MyAwIDMzIDUgNDkgMTUgNTMgOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMQo5IDE1IDMzIDE1IDkyIDAgNjEgMyA4MCAxNSA4NCA4IDQgMTUgMTYgMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDExIDkgMTUgMzMgMTUKOTIgMCA2MSAzIDgwIDE1IDg0IDggNCAxNSAxNiAxNSAyOSAwIDEyIDcgMjggMTUgMzUgMTAgOSAxNSAzMiAxNSA3NyAwIDQ3IDQKNjUgMTUgNjkgOCA0IDE1IDE2IDE1IDI5IDAgMTIgNyAyOCAxNSAzNSAxMSA5IDE1IDMzIDE1IDkwIDAgNTcgNCA4MSAxNSA5MCA4CjcgMTUgMjcgMTUgNDUgMCAxOCA3IDM4IDE1IDQ1IDEwIDkgMTUgMzIgMTUgNzUgMCA0MyA1IDY2IDE1IDc1IDggNyAxNSAyNyAxNQo0NSAwIDE4IDcgMzggMTUgNDUgMTAgOSAxNSAzMiAxNSA3NSAwIDQzIDUgNjYgMTUgNzUgOCA3IDE1IDI3IDE1IDQ1IDAgMTggNwozOCAxNSA0NSAxMCA5IDE1IDMyIDE1IDc1IDAgNDMgNSA2NiAxNSA3NSA4IDcgMTUgMjcgMTUgNDUgMCAxOCA3IDM4IDE1IDQ1IDkKOCAxNSAzMCAxNSA2MCAwIDMwIDYgNTIgMTUgNjAgMTAgOSAxNSAzMiAxNSA3NSAwIDQzIDUgNjYgMTUgNzUgOSA3IDE1IDI5IDE1CjUxIDAgMjggLTQgMzkgLTE1IDM5IC05IDAgLTE1IC05IC0xNSAtMjR6IE02NjA3IDYyMzMgYy00IC0zIC03IC0xMDkgLTcgLTIzMwowIC0xOTAgMiAtMjMwIDE1IC0yNDAgOSAtOCAxNSAtMzAgMTUgLTYwIDAgLTMwIDYgLTUyIDE1IC02MCAxMiAtMTAgMTUgLTQ4CjE1IC0yMjUgMCAtMTc3IDMgLTIxNSAxNSAtMjI1IDEwIC05IDE1IC0zMiAxNSAtNzUgMCAtNDMgNSAtNjYgMTUgLTc1IDEyIC0xMAoxNSAtNDcgMTUgLTIxMCAwIC0xNjMgMyAtMjAwIDE1IC0yMTAgMTEgLTkgMTUgLTM1IDE1IC0xMDUgMCAtNzAgNCAtOTYgMTUKLTEwNSAxMiAtMTAgMTUgLTQzIDE1IC0xODAgMCAtMTM3IDMgLTE3MCAxNSAtMTgwIDEyIC0xMCAxNSAtMzcgMTUgLTEyMCAwCi04MyAzIC0xMTAgMTUgLTEyMCAxMiAtMTAgMTUgLTQyIDE1IC0xNjUgMCAtMTIzIDMgLTE1NSAxNSAtMTY1IDEyIC0xMCAxNQotMzggMTUgLTEzNSAwIC05NyAzIC0xMjUgMTUgLTEzNSAxMiAtMTAgMTUgLTQwIDE1IC0xNTAgMCAtMTEwIDMgLTE0MCAxNQotMTUwIDEyIC0xMCAxNSAtNDAgMTUgLTE1MCAwIC0xMTAgMyAtMTQwIDE1IC0xNTAgMTIgLTEwIDE1IC0zOCAxNSAtMTM1IDAKLTk3IDMgLTEyNSAxNSAtMTM1IDEyIC0xMCAxNSAtNDMgMTUgLTE4MCAwIC0xMzcgMyAtMTcwIDE1IC0xODAgMTEgLTkgMTUgLTM1CjE1IC0xMDUgMCAtNzAgNCAtOTYgMTUgLTEwNSAxMiAtMTAgMTUgLTQ1IDE1IC0xOTUgMCAtMTUwIDMgLTE4NSAxNSAtMTk1IDgKLTcgMTUgLTI3IDE1IC00NSAwIC0xOCA3IC0zOCAxNSAtNDUgOCAtNyAxNSAtMjcgMTUgLTQ0IDAgLTI0IDEwIC00MSAzOCAtNjkKMjEgLTIwIDQ1IC0zNyA1MyAtMzcgOCAwIDI4IC0xMyA0NCAtMzAgMjQgLTI1IDM3IC0zMCA3NiAtMzAgMjkgMCA1MSAtNiA1OQotMTUgOCAtOSAzMCAtMTUgNjAgLTE1IDMwIDAgNTIgLTYgNjAgLTE1IDggLTkgMzAgLTE1IDYwIC0xNSAzMCAwIDUyIC02IDYwCi0xNSA5IC0xMCAzMiAtMTUgNzUgLTE1IDQzIDAgNjYgLTUgNzUgLTE1IDggLTkgMzAgLTE1IDYwIC0xNSAzMCAwIDUyIC02IDYwCi0xNSA5IC0xMCAzMiAtMTUgNzUgLTE1IDQzIDAgNjYgLTUgNzUgLTE1IDcgLTggMjcgLTE1IDQ1IC0xNSAxOCAwIDM4IC03IDQ1Ci0xNSA5IC0xMSAzMyAtMTUgOTAgLTE1IDU3IDAgODEgLTQgOTAgLTE1IDcgLTggMjcgLTE1IDQ1IC0xNSAxOCAwIDM4IC03IDQ1Ci0xNSA5IC0xMSAzMyAtMTUgOTAgLTE1IDU3IDAgODEgLTQgOTAgLTE1IDkgLTEwIDMyIC0xNSA3NCAtMTUgNTIgMCA2NiA0IDg0CjIzIDIxIDIyIDIyIDMxIDIyIDI0OSAwIDE4OCAtMiAyMjggLTE1IDIzOCAtMTEgOSAtMTUgMzUgLTE1IDEwNSAwIDcwIC00IDk2Ci0xNSAxMDUgLTEyIDEwIC0xNSA0MiAtMTUgMTY1IDAgMTIzIC0zIDE1NSAtMTUgMTY1IC0xMiAxMCAtMTUgMzcgLTE1IDEyMCAwCjgzIC0zIDExMCAtMTUgMTIwIC0xMiAxMCAtMTUgNDIgLTE1IDE2NSAwIDEyMyAtMyAxNTUgLTE1IDE2NSAtMTIgMTAgLTE1IDM4Ci0xNSAxMzUgMCA5NyAtMyAxMjUgLTE1IDEzNSAtMTIgMTAgLTE1IDM3IC0xNSAxMjAgMCA4MyAtMyAxMTAgLTE1IDEyMCAtMTIKMTAgLTE1IDQyIC0xNSAxNjUgMCAxMjMgLTMgMTU1IC0xNSAxNjUgLTEyIDEwIC0xNSAzNyAtMTUgMTIwIDAgODMgLTMgMTEwCi0xNSAxMjAgLTEyIDEwIC0xNSA0MiAtMTUgMTY1IDAgMTIzIC0zIDE1NSAtMTUgMTY1IC0xMSA5IC0xNSAzNSAtMTUgMTA1IDAKNzAgLTQgOTYgLTE1IDEwNSAtMTIgMTAgLTE1IDQzIC0xNSAxODAgMCAxMzcgLTMgMTcwIC0xNSAxODAgLTEwIDkgLTE1IDMyCi0xNSA3NSAwIDQzIC01IDY2IC0xNSA3NSAtMTIgMTAgLTE1IDQ3IC0xNSAyMTAgMCAxNjMgLTMgMjAwIC0xNSAyMTAgLTEwIDkKLTE1IDMyIC0xNSA3NSAwIDQzIC01IDY2IC0xNSA3NSAtMTIgMTAgLTE1IDQ1IC0xNSAxOTUgMCAxNTAgLTMgMTg1IC0xNSAxOTUKLTEwIDkgLTE1IDMyIC0xNSA3NSAwIDQzIC01IDY2IC0xNSA3NSAtMTIgMTAgLTE1IDQ5IC0xNyAxOTkgbC0zIDE4NiAtMzM2IDMKYy0yODQgMiAtMzM5IDUgLTM0OSAxNyAtNyA4IC0yNyAxNSAtNDUgMTUgLTE4IDAgLTM4IDcgLTQ1IDE1IC05IDExIC0zMyAxNQotOTAgMTUgLTU3IDAgLTgxIDQgLTkwIDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUgLTkgMTEgLTMzCjE1IC05MCAxNSAtNTcgMCAtODEgNCAtOTAgMTUgLTcgOCAtMjcgMTUgLTQ1IDE1IC0xOCAwIC0zOCA3IC00NSAxNSAtOSAxMQotMzUgMTUgLTEwNSAxNSAtNzAgMCAtOTYgNCAtMTA1IDE1IC0xMyAxNSAtMTI5IDIyIC0xNDMgOHoiLz4KPC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwxNjQxLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIgZmlsbD0iIzFCM0Y3QSI+CjxwYXRoIGQ9Ik05OTI2IDEzOTA1IGMtMyAtOSAtMTggLTE1IC0zOSAtMTUgLTI1IDAgLTQyIC05IC03MCAtMzggLTIwIC0yMQotMzcgLTQ1IC0zNyAtNTMgMCAtOCAtMTMgLTI4IC0zMCAtNDQgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMTMgLTI5Ci0zMCAtNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMjAgLTM2IC00NSAtNjAgLTI1IC0yNCAtNDUgLTUxIC00NQotNjAgMCAtOSAtMjAgLTM2IC00NSAtNjAgLTI1IC0yNCAtNDUgLTUyIC00NSAtNjIgMCAtMTAgLTcgLTIxIC0xNSAtMjQgLTggLTQKLTE1IC0xNiAtMTUgLTI4IDAgLTEyIC0xMyAtMzUgLTMwIC01MSAtMTYgLTE2IC0zMCAtMzYgLTMwIC00NSAwIC05IC0xMyAtMjkKLTMwIC00NSAtMTYgLTE2IC0zMCAtMzYgLTMwIC00NSAwIC05IC0yMCAtMzYgLTQ1IC02MCAtMjUgLTI0IC00NSAtNTEgLTQ1Ci02MCAwIC05IC0xMyAtMjkgLTMwIC00NSAtMTYgLTE2IC0zMCAtMzcgLTMwIC00NyAwIC0xMCAtNyAtMjEgLTE1IC0yNCAtOSAtNAotMTUgLTE5IC0xNSAtMzUgMCAtMjYgLTQgLTI5IC0zMCAtMjkgLTI1IDAgLTMwIC00IC0zMCAtMjMgMCAtMTMgLTEzIC0zNiAtMzAKLTUyIC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAgLTkgLTEzIC0yOSAtMzAgLTQ1IC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAKLTkgLTEzIC0yOSAtMzAgLTQ1IC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAgLTkgLTEzIC0yOSAtMzAgLTQ1IC0xNiAtMTYgLTMwCi0zNiAtMzAgLTQ1IDAgLTkgLTEzIC0yOSAtMzAgLTQ1IC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAgLTkgLTEzIC0yOSAtMzAKLTQ1IC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAgLTkgLTEzIC0yOSAtMzAgLTQ1IC0xNiAtMTYgLTMwIC0zNiAtMzAgLTQ1IDAKLTkgLTIwIC0zNiAtNDUgLTYwIC0yNSAtMjQgLTQ1IC01MiAtNDUgLTYyIDAgLTEwIC03IC0yMSAtMTUgLTI0IC04IC00IC0xNQotMTYgLTE1IC0yOCAwIC0xMyAtMTkgLTQwIC00NSAtNjYgLTI1IC0yNCAtNDUgLTUxIC00NSAtNjAgMCAtOSAtMTMgLTI5IC0zMAotNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMTMgLTI5IC0zMCAtNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMAotOSAtMTMgLTI5IC0zMCAtNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMTMgLTI5IC0zMCAtNDUgLTE2IC0xNiAtMzAKLTM2IC0zMCAtNDUgMCAtOSAtMTMgLTI5IC0zMCAtNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMTMgLTI5IC0zMAotNDUgLTE2IC0xNiAtMzAgLTM2IC0zMCAtNDUgMCAtOSAtMTQgLTI5IC0zMCAtNDUgLTI1IC0yNCAtMzAgLTM3IC0yOCAtNjUgMwotMzIgNiAtMzUgMzggLTM4IDI4IC0yIDQxIDMgNjUgMjggMjAgMjEgMzggMzAgNjEgMzAgMTcgMCAzNyA3IDQ0IDE1IDcgOCAyMAoxNSAzMCAxNSAxMCAwIDIzIDcgMzAgMTUgNyA4IDI3IDE1IDQ0IDE1IDIzIDAgNDEgOSA2MSAzMCAyMCAyMSAzOCAzMCA2MSAzMAoxNyAwIDM3IDcgNDQgMTUgNyA4IDIwIDE1IDMwIDE1IDEwIDAgMjMgNyAzMCAxNSA3IDggMjcgMTUgNDQgMTUgMjMgMCA0MSA5CjYxIDMwIDIwIDIxIDM4IDMwIDYxIDMwIDE3IDAgMzcgNyA0NCAxNSA3IDggMjAgMTUgMzAgMTUgMTAgMCAyMyA3IDMwIDE1IDcgOAoyNyAxNSA0NSAxNSAxOCAwIDM4IDcgNDUgMTUgNyA4IDIwIDE1IDMwIDE1IDEwIDAgMjMgNyAzMCAxNSA3IDggMjAgMTUgMzAgMTUKMTAgMCAyMyA3IDMwIDE1IDcgOCAyMCAxNSAzMCAxNSAxMCAwIDIzIDcgMzAgMTUgNyA4IDI3IDE1IDQ1IDE1IDE4IDAgMzggNwo0NSAxNSA3IDggMjAgMTUgMzAgMTUgMTAgMCAyMyA3IDMwIDE1IDcgOCAyMCAxNSAzMCAxNSAxMCAwIDIzIDcgMzAgMTUgNyA4CjI3IDE1IDQ0IDE1IDIzIDAgNDEgOSA2MSAzMCAyMCAyMSAzOCAzMCA2MSAzMCAxNyAwIDM3IDcgNDQgMTUgNyA4IDIwIDE1IDMwCjE1IDEwIDAgMjMgNyAzMCAxNSA3IDggMjcgMTUgNDQgMTUgMjMgMCA0MSA5IDYxIDMwIDI0IDI1IDM3IDMwIDc1IDMwIDM4IDAKNTEgNSA3NSAzMCAyMCAyMSAzOCAzMCA2MSAzMCAxNyAwIDM3IDcgNDQgMTUgNyA4IDIwIDE1IDMwIDE1IDEwIDAgMjMgNyAzMAoxNSA3IDggMjcgMTUgNDQgMTUgMjMgMCA0MSA5IDYxIDMwIDIwIDIxIDM4IDMwIDYxIDMwIDE3IDAgMzcgNyA0NCAxNSA3IDggMjAKMTUgMzAgMTUgMTAgMCAyMyA3IDMwIDE1IDcgOCAyNyAxNSA0NCAxNSAyMyAwIDQxIDkgNjEgMzAgMjAgMjEgMzggMzAgNjEgMzAKMTcgMCAzNyA3IDQ0IDE1IDcgOCAyMCAxNSAzMCAxNSAxMCAwIDIzIDcgMzAgMTUgNyA4IDIwIDE1IDMwIDE1IDEwIDAgMjMgNwozMCAxNSA3IDggMjAgMTUgMzAgMTUgMTAgMCAyMyA3IDMwIDE1IDcgOCAyNyAxNSA0NSAxNSAxOCAwIDM4IDcgNDUgMTUgNyA4CjIwIDE1IDMwIDE1IDEwIDAgMjMgNyAzMCAxNSA3IDggMjAgMTUgMjkgMTUgMjQgMCAxMjEgMTAyIDEyMSAxMjcgMCAxMSA3IDIzCjE1IDI3IDggMyAxNSAxNCAxNSAyNCAwIDExIC03IDI1IC0xNSAzMiAtOCA3IC0xNSAyNyAtMTUgNDQgMCAyMyAtOSA0MSAtMzAKNjEgLTE2IDE2IC0zMCAzNiAtMzAgNDUgMCA5IC0xMyAyOSAtMzAgNDUgLTE2IDE2IC0zMCAzOSAtMzAgNTIgMCAxOSAtNSAyMwotMzAgMjMgLTI1IDAgLTMwIDQgLTMwIDIzIDAgMTMgLTEzIDM2IC0zMCA1MiAtMTYgMTYgLTMwIDM2IC0zMCA0NSAwIDggLTI3CjQyIC02MCA3NSAtMzMgMzMgLTYwIDY3IC02MCA3NSAwIDkgLTEzIDI5IC0zMCA0NSAtMTYgMTYgLTMwIDM5IC0zMCA1MiAwIDE5Ci01IDIzIC0zMCAyMyAtMjUgMCAtMzAgNCAtMzAgMjMgMCAxMyAtMTMgMzYgLTMwIDUyIC0xNiAxNiAtMzAgMzYgLTMwIDQ1IDAgOAotMjcgNDIgLTYwIDc1IC0zMyAzMyAtNjAgNjYgLTYwIDc1IDAgOCAtMzQgNDkgLTc1IDkwIC00MSA0MSAtNzUgODEgLTc1IDkwIDAKOSAtMzAgNDYgLTY4IDgzIC01NiA1NSAtNzMgNjcgLTEwMCA2NyAtMjAgMCAtMzUgNiAtMzggMTUgLTQgOCAtMTIgMTUgLTE5IDE1Ci03IDAgLTE1IC03IC0xOSAtMTV6Ii8+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMTY0MS4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiIGZpbGw9IiMwRUE1RTkiPgo8cGF0aCBkPSJNMTExOTAgMTE0MTUgYy0xMCAtMTIgLTM3IC0xNSAtMTIwIC0xNSAtODMgMCAtMTEwIC0zIC0xMjAgLTE1IC03Ci04IC0yMCAtMTUgLTMwIC0xNSAtMTAgMCAtMjMgLTcgLTMwIC0xNSAtMTAgLTEyIC0zNyAtMTUgLTEyMCAtMTUgLTgzIDAgLTExMAotMyAtMTIwIC0xNSAtNyAtOCAtMjAgLTE1IC0zMCAtMTUgLTEwIDAgLTIzIC03IC0zMCAtMTUgLTEwIC0xMiAtMzcgLTE1IC0xMjAKLTE1IC04MyAwIC0xMTAgLTMgLTEyMCAtMTUgLTcgLTggLTIwIC0xNSAtMzAgLTE1IC0xMCAwIC0yMyAtNyAtMzAgLTE1IC0xMAotMTIgLTM3IC0xNSAtMTIwIC0xNSAtODMgMCAtMTEwIC0zIC0xMjAgLTE1IC03IC04IC0yNyAtMTUgLTQ1IC0xNSAtMTggMCAtMzgKLTcgLTQ1IC0xNSAtOSAtMTEgLTM1IC0xNSAtMTA1IC0xNSAtNzAgMCAtOTYgLTQgLTEwNSAtMTUgLTcgLTggLTIwIC0xNSAtMzAKLTE1IC0xMCAwIC0yMyAtNyAtMzAgLTE1IC05IC0xMSAtMzUgLTE1IC0xMDUgLTE1IC03MCAwIC05NiAtNCAtMTA1IC0xNSAtNwotOCAtMjcgLTE1IC00NSAtMTUgLTE4IDAgLTM4IC03IC00NSAtMTUgLTkgLTExIC0zNSAtMTUgLTEwNSAtMTUgLTcwIDAgLTk2Ci00IC0xMDUgLTE1IC03IC04IC0yNyAtMTUgLTQ1IC0xNSAtMTggMCAtMzggLTcgLTQ1IC0xNSAtOSAtMTEgLTMzIC0xNSAtOTAKLTE1IC01NyAwIC04MSAtNCAtOTAgLTE1IC04IC05IC0zMCAtMTUgLTYwIC0xNSAtMzAgMCAtNTIgLTYgLTYwIC0xNSAtOSAtMTAKLTMyIC0xNSAtNzUgLTE1IC00MyAwIC02NiAtNSAtNzUgLTE1IC05IC0xMCAtMzIgLTE1IC03NSAtMTUgLTQzIDAgLTY2IC01Ci03NSAtMTUgLTkgLTEwIC0zMiAtMTUgLTc0IC0xNSAtNDUgLTEgLTY3IC02IC04MyAtMTkgLTEzIC0xMSAtMjMgLTIyIC0yMwotMjYgMCAtMTIgNDQgLTQ0IDYxIC00NSA5IDAgMjIgLTcgMjkgLTE1IDkgLTExIDMzIC0xNSA5MCAtMTUgNTcgMCA4MSAtNCA5MAotMTUgOCAtOSAzMCAtMTUgNjAgLTE1IDMwIDAgNTIgLTYgNjAgLTE1IDkgLTExIDM1IC0xNSAxMDUgLTE1IDcwIDAgOTYgLTQKMTA1IC0xNSA3IC04IDIwIC0xNSAzMCAtMTUgMTAgMCAyMyAtNyAzMCAtMTUgOSAtMTEgMzUgLTE1IDEwNSAtMTUgNzAgMCA5NgotNCAxMDUgLTE1IDcgLTggMjcgLTE1IDQ1IC0xNSAxOCAwIDM4IC03IDQ1IC0xNSA5IC0xMSAzNSAtMTUgMTA1IC0xNSA3MCAwCjk2IC00IDEwNSAtMTUgNyAtOCAyMCAtMTUgMzAgLTE1IDEwIDAgMjMgLTcgMzAgLTE1IDEwIC0xMiAzNyAtMTUgMTIwIC0xNSA4MwowIDExMCAtMyAxMjAgLTE1IDcgLTggMjAgLTE1IDMwIC0xNSAxMCAwIDIzIC03IDMwIC0xNSAxMCAtMTIgMzcgLTE1IDEyMCAtMTUKODMgMCAxMTAgLTMgMTIwIC0xNSA3IC04IDI3IC0xNSA0NSAtMTUgMTggMCAzOCAtNyA0NSAtMTUgOSAtMTEgMzUgLTE1IDEwNQotMTUgNzAgMCA5NiAtNCAxMDUgLTE1IDcgLTggMjcgLTE1IDQ1IC0xNSAxOCAwIDM4IC03IDQ1IC0xNSA5IC0xMSAzNSAtMTUKMTA1IC0xNSA3MCAwIDk2IC00IDEwNSAtMTUgNyAtOCAyNyAtMTUgNDUgLTE1IDE4IDAgMzggLTcgNDUgLTE1IDkgLTExIDMzCi0xNSA5MCAtMTUgNTcgMCA4MSAtNCA5MCAtMTUgOCAtOSAzMCAtMTUgNjAgLTE1IDMwIDAgNTIgLTYgNjAgLTE1IDEwIC0xMiA0MgotMTUgMTY0IC0xNSBsMTUyIDAgMzcgMzggYzIwIDIxIDM3IDQ1IDM3IDU0IDAgOCA3IDIxIDE1IDI4IDEzIDExIDE1IDc4IDE1CjQ5NCBsMCA0ODIgLTMwIDI5IGMtMTYgMTYgLTMwIDM5IC0zMCA1MiAwIDIwIC01IDIzIC0zOSAyMyAtMjIgMCAtNDQgNiAtNTEKMTUgLTkgMTAgLTMyIDE1IC03NSAxNSAtNDMgMCAtNjYgLTUgLTc1IC0xNXoiLz4KPC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwxNjQxLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIgZmlsbD0iI0Y5NzMxNiI+CjxwYXRoIGQ9Ik04NDYwIDEwMjE1IGMwIC0xMCAxMCAtMTUgMzAgLTE1IDE3IDAgMzAgLTUgMzAgLTExIDAgLTE1IDQxIC00OCA2MAotNDkgOSAwIDM2IC0yMCA2MCAtNDUgMjQgLTI1IDUxIC00NSA2MCAtNDUgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMAo0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2Ci0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM5IC0zMCA1MiAtMzAgMTkgMCAyMyAtNSAyMyAtMzAgMCAtMjggMgotMzAgMzggLTMwIDI5IDAgNDUgLTcgNjcgLTMwIDE2IC0xNiAzOSAtMzAgNTIgLTMwIDE5IDAgMjMgLTUgMjMgLTMwIDAgLTI1IDQKLTMwIDIzIC0zMCAxMyAwIDM2IC0xMyA1MiAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2CjM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYKLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NiAtMzAgOSAwIDIyIC03IDI5IC0xNSA3Ci04IDIwIC0xNSAyOSAtMTUgOSAwIDM3IC0yMCA2MSAtNDUgMjQgLTI1IDUxIC00NSA2MCAtNDUgOSAwIDM2IC0yMCA2MCAtNDUKMjQgLTI1IDUxIC00NSA2MCAtNDUgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NQotMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMwo0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5Ci0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwIDI5IC0xMyA0NSAtMzAgMTYgLTE2IDM2IC0zMCA0NSAtMzAgOSAwCjI5IC0xMyA0NSAtMzAgMjcgLTI4IDMzIC0zMCAxMDUgLTMwIGw3NiAwIDY3IDY4IGMzNyAzNyA2NyA3NSA2NyA4NSAwIDEwIDcKMjAgMTUgMjMgOCA0IDE1IDE3IDE1IDMwIDAgMTQgNyAyNyAxNSAzMCA4IDQgMTUgMTYgMTUgMjkgMCAxMiA3IDI4IDE1IDM1IDEwCjkgMTUgMzIgMTUgNzUgMCA0MyAtNSA2NiAtMTUgNzUgLTggNyAtMTUgMjMgLTE1IDM2IDAgMjEgLTUgMjQgLTM4IDI0IC0yOSAwCi00NSA3IC02NyAzMCAtMjAgMjEgLTM4IDMwIC02MSAzMCAtMTcgMCAtMzcgNyAtNDQgMTUgLTcgOCAtMjAgMTUgLTMwIDE1IC0xMAowIC0yMyA3IC0zMCAxNSAtNyA4IC0yNyAxNSAtNDUgMTUgLTE4IDAgLTM4IDcgLTQ1IDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAKMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjAgMTUgLTMwIDE1IC0xMCAwIC0yMyA3IC0zMCAxNSAtNyA4IC0yNyAxNSAtNDUgMTUgLTE4CjAgLTM4IDcgLTQ1IDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjcgMTUgLTQ1IDE1IC0xOAowIC0zOCA3IC00NSAxNSAtNyA4IC0yMCAxNSAtMzAgMTUgLTEwIDAgLTIzIDcgLTMwIDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAKMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjAgMTUgLTMwIDE1IC0xMCAwIC0yMyA3IC0zMCAxNSAtNyA4IC0yNyAxNSAtNDUgMTUgLTE4CjAgLTM4IDcgLTQ1IDE1IC03IDggLTIwIDE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjcgMTUgLTQ0IDE1IC0yMwowIC00MSA5IC02MSAzMCAtMjQgMjUgLTM3IDMwIC03NSAzMCAtMzggMCAtNTEgNSAtNzUgMzAgLTI0IDI1IC0zNyAzMCAtNzUgMzAKLTM4IDAgLTUxIDUgLTc1IDMwIC0yNCAyNSAtMzcgMzAgLTc1IDMwIC0zOCAwIC01MSA1IC03NSAzMCAtMjQgMjUgLTM3IDMwCi03NSAzMCAtMzggMCAtNTEgNSAtNzUgMzAgLTIwIDIxIC0zOCAzMCAtNjEgMzAgLTE3IDAgLTM3IDcgLTQ0IDE1IC03IDggLTIwCjE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjcgMTUgLTQ1IDE1IC0xOCAwIC0zOCA3IC00NSAxNSAtNyA4IC0yMAoxNSAtMzAgMTUgLTEwIDAgLTIzIDcgLTMwIDE1IC03IDggLTI3IDE1IC00NSAxNSAtMTggMCAtMzggNyAtNDUgMTUgLTcgOCAtMjAKMTUgLTMwIDE1IC0xMCAwIC0yMyA3IC0zMCAxNSAtNyA4IC0yMCAxNSAtMzAgMTUgLTEwIDAgLTIzIDcgLTMwIDE1IC03IDggLTIwCjE1IC0zMCAxNSAtMTAgMCAtMjMgNyAtMzAgMTUgLTcgOCAtMjcgMTUgLTQ1IDE1IC0xOCAwIC0zOCA3IC00NSAxNSAtNyA4IC0yNwoxNSAtNDUgMTUgLTE4IDAgLTM4IDcgLTQ1IDE1IC03IDggLTIzIDE1IC0zNiAxNSAtMTUgMCAtMjQgNiAtMjQgMTUgMCAxMCAtMTAKMTUgLTMwIDE1IC0yMCAwIC0zMCAtNSAtMzAgLTE1eiIvPgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDE2NDEuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIiBmaWxsPSIjMEVBNUU5Ij4KPHBhdGggZD0iTTgwNDAgOTk3NSBjMCAtOCA3IC0xNSAxNSAtMTUgOCAwIDE1IDcgMTUgMTUgMCA4IC03IDE1IC0xNSAxNSAtOCAwCi0xNSAtNyAtMTUgLTE1eiBNODEwMCA5ODc2IGMwIC00OCAzIC01NyAzMCAtNzkgMjYgLTIyIDMwIC0zMyAzMCAtNzQgMCAtNDIgNQotNTQgMzAgLTc4IDIxIC0yMCAzMCAtMzggMzAgLTYwIDAgLTIyIDkgLTQwIDMwIC02MCAyMSAtMjAgMzAgLTM4IDMwIC02MSAwCi0xNyA3IC0zNyAxNSAtNDQgOCAtNyAxNSAtMjMgMTUgLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSA5IC0zIDE1IC0xOCAxNSAtMzkgMAotMjQgOCAtNDEgMzAgLTYyIDIxIC0yMCAzMCAtMzggMzAgLTYxIDAgLTE3IDcgLTM3IDE1IC00NCA4IC03IDE1IC0yMyAxNSAtMzUKMCAtMTMgNyAtMjUgMTUgLTI5IDkgLTMgMTUgLTE4IDE1IC0zOSAwIC0xOSA3IC00MCAxNSAtNDcgOCAtNyAxNSAtMjMgMTUgLTM1CjAgLTEzIDcgLTI1IDE1IC0yOSA4IC0zIDE1IC0xNiAxNSAtMzAgMCAtMTMgNyAtMjYgMTUgLTMwIDggLTMgMTUgLTE2IDE1IC0zMAowIC0xMyA3IC0yNiAxNSAtMzAgOCAtMyAxNSAtMTYgMTUgLTMwIDAgLTEzIDcgLTI2IDE1IC0zMCA5IC0zIDE1IC0xOCAxNSAtMzkKMCAtMTkgNyAtNDAgMTUgLTQ3IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkgOSAtMyAxNSAtMTggMTUgLTM5CjAgLTI0IDggLTQxIDMwIC02MiAyMSAtMjAgMzAgLTM4IDMwIC02MSAwIC0xNyA3IC0zNyAxNSAtNDQgOCAtNyAxNSAtMjMgMTUKLTM1IDAgLTEzIDcgLTI1IDE1IC0yOSA5IC0zIDE1IC0xOCAxNSAtMzkgMCAtMjQgOCAtNDEgMzAgLTYyIDIxIC0yMCAzMCAtMzgKMzAgLTYxIDAgLTE3IDcgLTM3IDE1IC00NCA4IC03IDE1IC0yMyAxNSAtMzUgMCAtMTMgNyAtMjUgMTUgLTI5IDkgLTMgMTUgLTE4CjE1IC0zOSAwIC0yNCA4IC00MSAzMCAtNjIgMjUgLTI0IDMwIC0zNyAzMCAtNzUgMCAtMzggNSAtNTEgMzAgLTc1IDIxIC0yMCAzMAotMzggMzAgLTYwIDAgLTIyIDkgLTQwIDMwIC02MCAyNSAtMjQgMzAgLTM3IDMwIC03NSAwIC0zOCA1IC01MSAzMCAtNzUgMjEKLTIwIDMwIC0zOCAzMCAtNjEgMCAtMTcgNyAtMzcgMTUgLTQ0IDggLTcgMTUgLTIzIDE1IC0zNSAwIC0xMyA3IC0yNSAxNSAtMjkKOCAtMyAxNSAtMTYgMTUgLTMwIDAgLTEzIDcgLTI2IDE1IC0zMCA4IC0zIDE1IC0xNiAxNSAtMzAgMCAtMTMgNyAtMjYgMTUgLTMwCjggLTMgMTUgLTE3IDE1IC0zMSAwIC0yMCA1IC0yNSAyNCAtMjUgMTMgMCAyOSAtNyAzNiAtMTUgOSAtMTAgMzIgLTE1IDc1IC0xNQo0MyAwIDY2IDUgNzUgMTUgNyA4IDI3IDE1IDQ0IDE1IDIzIDAgNDEgOSA2MSAzMCAyMiAyMyAzOCAzMCA2NyAzMCAzNiAwIDM4IDIKMzggMzAgMCAyNyAzIDMwIDMwIDMwIDI3IDAgMzAgMyAzMCAzMCAwIDI3IDMgMzAgMzAgMzAgbDMwIDAgMCAxMTMgYzAgMTEzIDAKMTEzIC0zMCAxNDIgLTE2IDE2IC0zMCAzOSAtMzAgNTIgMCAxOSAtNSAyMyAtMzAgMjMgLTI1IDAgLTMwIDQgLTMwIDIzIDAgMTMKLTEzIDM2IC0zMCA1MiAtMTYgMTYgLTMwIDM2IC0zMCA0NSAwIDkgLTEzIDI5IC0zMCA0NSAtMTYgMTYgLTMwIDM2IC0zMCA0NSAwCjggLTI3IDQyIC02MCA3NSAtMzcgMzYgLTYwIDY4IC02MCA4MSAwIDEyIC03IDI0IC0xNSAyOCAtOCAzIC0xNSAxNCAtMTUgMjQgMAoxMCAtMjAgMzggLTQ1IDYyIC0yNSAyNCAtNDUgNTEgLTQ1IDYwIDAgOSAtMjAgMzYgLTQ1IDYwIC0yNSAyNCAtNDUgNTEgLTQ1CjYwIDAgOSAtMTMgMjkgLTMwIDQ1IC0xNiAxNiAtMzAgMzYgLTMwIDQ1IDAgOSAtMTMgMjkgLTMwIDQ1IC0xNiAxNiAtMzAgMzkKLTMwIDUyIDAgMTkgLTUgMjMgLTMwIDIzIC0yNSAwIC0zMCA0IC0zMCAyMyAwIDEzIC0xMyAzNiAtMzAgNTIgLTE2IDE2IC0zMAozNiAtMzAgNDUgMCA5IC0xMyAyOSAtMzAgNDUgLTE2IDE2IC0zMCAzNiAtMzAgNDUgMCA5IC0xMyAyOSAtMzAgNDUgLTE2IDE2Ci0zMCAzOSAtMzAgNTIgMCAxOSAtNSAyMyAtMzAgMjMgLTI1IDAgLTMwIDQgLTMwIDIzIDAgMTMgLTEzIDM2IC0zMCA1MiAtMTYKMTYgLTMwIDM2IC0zMCA0NSAwIDkgLTIwIDM2IC00NSA2MCAtMjUgMjQgLTQ1IDUxIC00NSA2MCAwIDkgLTEzIDI5IC0zMCA0NQotMTYgMTYgLTMwIDM2IC0zMCA0NSAwIDkgLTIwIDM2IC00NSA2MCAtMjUgMjQgLTQ1IDUxIC00NSA2MCAwIDkgLTIwIDM2IC00NQo2MCAtMjUgMjQgLTQ1IDUxIC00NSA2MCAwIDkgLTEzIDI5IC0zMCA0NSAtMTYgMTYgLTMwIDM2IC0zMCA0NSAwIDggLTI3IDQyCi02MCA3NSAtMzMgMzMgLTYwIDY3IC02MCA3NiAwIDEwIC0xMyAyOSAtMzAgNDIgLTE5IDE2IC0zMCAzNSAtMzAgNTEgMCAyMCAtNgoyNSAtMjcgMjggLTI1IDMgLTI4IDcgLTMxIDQ2IC0yIDI4IC04IDQyIC0xOCA0MiAtMTAgMCAtMTQgLTE0IC0xNCAtNTR6Ii8+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMTY0MS4wMDAwMDApIHNjYWxlKDAuMTAwMDAwLC0wLjEwMDAwMCkiIGZpbGw9IiM3REQzRkMiPgo8cGF0aCBkPSJNNzYyMCA5NTYxIGMwIC00OSAtNCAtNzIgLTE1IC04MSAtMTMgLTExIC0xNSAtNjAgLTE1IC0zMzAgMCAtMjcwCi0yIC0zMTkgLTE1IC0zMzAgLTEyIC0xMCAtMTUgLTQwIC0xNSAtMTUwIDAgLTExMCAtMyAtMTQwIC0xNSAtMTUwIC0xMyAtMTEKLTE1IC02MiAtMTUgLTM0NSAwIC0yODMgLTIgLTMzNCAtMTUgLTM0NSAtMTIgLTEwIC0xNSAtMzggLTE1IC0xMzUgMCAtOTcgLTMKLTEyNSAtMTUgLTEzNSAtMTMgLTExIC0xNSAtNzIgLTE1IC00NDEgbDAgLTQyOSAyNCAwIGMxMyAwIDI5IC03IDM2IC0xNSAxMAotMTIgNDAgLTE1IDE1MCAtMTUgMTEwIDAgMTQwIDMgMTUwIDE1IDggMTAgMzEgMTUgNjYgMTUgNTAgMCA1NCAyIDU0IDI0IDAgMTMKNyAyOSAxNSAzNiAxMSA5IDE1IDMzIDE1IDkwIDAgNTcgLTQgODEgLTE1IDkwIC0xMiAxMCAtMTUgNDIgLTE1IDE2NSAwIDEyMwotMyAxNTUgLTE1IDE2NSAtMTEgOSAtMTUgMzMgLTE1IDkwIDAgNTcgLTQgODEgLTE1IDkwIC0xMiAxMCAtMTUgNDIgLTE1IDE2NQowIDEyMyAtMyAxNTUgLTE1IDE2NSAtMTEgOSAtMTUgMzUgLTE1IDEwNSAwIDcwIC00IDk2IC0xNSAxMDUgLTEyIDEwIC0xNSA0MgotMTUgMTY1IDAgMTIzIC0zIDE1NSAtMTUgMTY1IC0xMiAxMCAtMTUgMzcgLTE1IDEyMCAwIDgzIC0zIDExMCAtMTUgMTIwIC0xMgoxMCAtMTUgNDAgLTE1IDE1MCAwIDExMCAtMyAxNDAgLTE1IDE1MCAtMTIgMTAgLTE1IDM3IC0xNSAxMjAgMCA4MyAtMyAxMTAKLTE1IDEyMCAtMTIgMTAgLTE1IDM3IC0xNSAxMjAgMCA4MyAtMyAxMTAgLTE1IDEyMCAtMTIgMTAgLTE1IDM3IC0xNSAxMjAgMAo4MyAtMyAxMTAgLTE1IDEyMCAtOCA3IC0xNSAyMyAtMTUgMzYgMCAxNSAtNiAyNCAtMTUgMjQgLTEyIDAgLTE1IC0xNCAtMTUKLTY5eiIvPgo8L2c+Cjwvc3ZnPg==" alt="MundiTrack"/>
     </div>
     <div class="logo-text-wrap">
-      <div class="logo-mark"><span class="undi">Mundi</span><span class="track">Track</span></div>
+      <div class="logo-mark">Mundi<span class="track">Track</span></div>
       <div class="logo-sub">Université Mundiapolis</div>
     </div>
   </div>
@@ -367,25 +269,24 @@
     <div class="user-avatar">DK</div>
     <div>
       <div class="user-name">Pr. Driss Khalil</div>
-      <div class="user-level">Chef de Filière GI</div>
+      <div class="user-level">Chef de 3 filières</div>
     </div>
   </div>
 
   <nav class="sidebar-nav">
     <div class="nav-label">Mon espace</div>
     <a class="nav-item active" href="#">
-      <span class="nav-icon">🏠</span> Tableau de bord
+      <span class="nav-icon">🌐</span> Vue globale
     </a>
     <a class="nav-item" href="#">
       <span class="nav-icon">👥</span> Suivi par classe
-      <span class="nav-badge muted">90</span>
     </a>
     <a class="nav-item" href="#">
       <span class="nav-icon">🎓</span> Affectation encadrants
     </a>
     <a class="nav-item" href="#">
       <span class="nav-icon">📝</span> Rapports hebdomadaires
-      <span class="nav-badge">8</span>
+      <span class="nav-badge">14</span>
     </a>
     <a class="nav-item" href="#">
       <span class="nav-icon">📅</span> Séances d'encadrement
@@ -394,10 +295,6 @@
     <a class="nav-item" href="#">
       <span class="nav-icon">🏛️</span> Soutenances
       <span class="nav-badge muted">bientôt</span>
-    </a>
-    <div class="nav-label">Analyse</div>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">📊</span> Dashboard filière
     </a>
   </nav>
 
@@ -415,356 +312,219 @@
 <main class="main">
   <div class="topbar">
     <div>
-      <div class="topbar-title">Tableau de bord</div>
-      <div class="topbar-sub">
-        <span class="filiere-select-wrap">
-          <span class="filiere-select" onclick="document.getElementById('filiereDropdown').classList.toggle('open')">
-            <span class="filiere-select-dot"></span>
-            <span class="filiere-select-text">Génie Informatique</span>
-            <span class="filiere-select-chevron">▾</span>
-          </span>
-          <div class="filiere-dropdown" id="filiereDropdown">
-            <div class="fd-header">Vos filières</div>
-            <div class="fd-item current">
-              <span class="fd-item-dot" style="background:var(--teal)"></span>
-              <span class="fd-item-name">Génie Informatique</span>
-              <span class="fd-item-meta">90 étud.</span>
-              <span class="fd-item-check">✓</span>
-            </div>
-            <div class="fd-item">
-              <span class="fd-item-dot" style="background:var(--purple)"></span>
-              <span class="fd-item-name">Génie Industriel</span>
-              <span class="fd-item-meta">65 étud.</span>
-            </div>
-            <div class="fd-item">
-              <span class="fd-item-dot" style="background:var(--green)"></span>
-              <span class="fd-item-name">Finance</span>
-              <span class="fd-item-meta">48 étud.</span>
-            </div>
-            <div class="fd-footer">
-              <span class="fd-global-link">🌐 Voir la vue globale →</span>
-            </div>
-          </div>
-        </span>
-        · 2025–2026
-      </div>
+      <div class="topbar-title">Vue globale</div>
+      <div class="topbar-sub">3 filières · Année académique 2025–2026</div>
     </div>
     <div class="topbar-actions">
       <div class="notif-btn">🔔<div class="notif-dot"></div></div>
-      <button class="btn btn-outline">📊 Exporter Excel</button>
+      <button class="btn btn-outline">📊 Exporter tout</button>
     </div>
   </div>
 
   <div class="content">
 
-    <!-- PRIORITÉ #1 : Rapports hebdo non lus -->
-    <div class="priority-banner">
-      <div class="priority-icon">📝</div>
-      <div class="priority-text">
-        <div class="priority-title">8 rapports hebdomadaires non lus cette semaine</div>
-        <div class="priority-sub">Les encadrants concernés n'ont pas encore consulté les rapports de leurs étudiants</div>
-      </div>
-      <button class="priority-action">Consulter maintenant →</button>
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <div class="mode-tab active">🌐 Vue globale</div>
+      <div class="mode-tab">📁 Vue par filière</div>
     </div>
 
-    <!-- STATS — sans soutenances -->
-    <div class="grid-4">
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon" style="background:#eff6ff">👥</div>
-        </div>
-        <div class="stat-value">90</div>
-        <div class="stat-label">Étudiants — Génie Informatique</div>
+    <div class="welcome-block">
+      <div class="welcome-title">Bonjour Pr. Khalil 👋</div>
+      <div class="welcome-sub">Vous gérez <strong>3 filières</strong> cette année. Voici où ça urge aujourd'hui.</div>
+    </div>
+
+    <!-- Global summary banner -->
+    <div class="global-banner">
+      <div class="gb-stat">
+        <div class="gb-value">203</div>
+        <div class="gb-label">Étudiants — toutes filières</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon" style="background:var(--green-light)">✅</div>
-          <span class="stat-trend trend-up">74%</span>
-        </div>
-        <div class="stat-value" style="color:#16a34a">67</div>
-        <div class="stat-label">Étudiants en stage</div>
+      <div class="gb-divider"></div>
+      <div class="gb-stat">
+        <div class="gb-value">142</div>
+        <div class="gb-label">En stage</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon" style="background:var(--purple-light)">🎓</div>
-        </div>
-        <div class="stat-value" style="color:var(--purple)">45</div>
-        <div class="stat-label">Encadrants affectés</div>
+      <div class="gb-divider"></div>
+      <div class="gb-stat">
+        <div class="gb-value alert">4</div>
+        <div class="gb-label">Filières avec alerte urgente</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon" style="background:var(--orange-light)">📝</div>
-        </div>
-        <div class="stat-value" style="color:var(--orange)">8</div>
-        <div class="stat-label">Rapports à consulter</div>
+      <div class="gb-divider"></div>
+      <div class="gb-stat">
+        <div class="gb-value">14</div>
+        <div class="gb-label">Rapports hebdo non lus</div>
       </div>
     </div>
 
-    <!-- 3 PHASES — Bleu / Orange / Jaune (signature visuelle) -->
-    <div class="phases-card">
-      <div class="phases-header">
-        <div>
-          <div class="phases-title">📊 Avancement par phase</div>
-          <div class="phases-sub">Suivi des 90 étudiants selon leur étape dans le parcours de stage</div>
+    <!-- Filière cards -->
+    <div class="section-title">📁 Vos filières</div>
+    <div class="filiere-grid">
+
+      <!-- Génie Informatique - urgent -->
+      <div class="filiere-card urgent">
+        <div class="fc-top">
+          <div class="fc-icon" style="background:#eff6ff">💻</div>
+          <div class="fc-urgent-badge">3 urgents</div>
         </div>
+        <div class="fc-name">Génie Informatique</div>
+        <div class="fc-niveau">1A · 2A · 4A · 5A</div>
+
+        <div class="fc-stats-row">
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value">90</div>
+            <div class="fc-stat-mini-label">Étudiants</div>
+          </div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:#16a34a">67</div>
+            <div class="fc-stat-mini-label">En stage</div>
+          </div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:var(--orange)">8</div>
+            <div class="fc-stat-mini-label">Rapports</div>
+          </div>
+        </div>
+        <div class="fc-progress-wrap"><div class="fc-progress-fill" style="width:74%; background:linear-gradient(to right, var(--teal), var(--navy))"></div></div>
+
+        <div class="fc-alerts">
+          <div class="fc-alert-line is-urgent"><span class="fc-alert-dot" style="background:var(--red)"></span> 3 étudiants sans encadrant affecté</div>
+          <div class="fc-alert-line"><span class="fc-alert-dot" style="background:var(--orange)"></span> 8 rapports hebdo non lus</div>
+        </div>
+
+        <button class="fc-action">Ouvrir le dashboard →</button>
       </div>
-      <div class="phases-grid">
 
-        <!-- Phase BLEU -->
-        <div class="phase-block phase-bleu">
-          <span class="phase-dot dot-bleu"></span>
-          <span class="phase-label label-bleu">Phase Initiale</span>
-          <div class="phase-name">Données collectées</div>
-          <div>
-            <span class="phase-count">90</span>
-            <span class="phase-total">/ 90 étudiants</span>
+      <!-- Génie Industriel - urgent -->
+      <div class="filiere-card urgent">
+        <div class="fc-top">
+          <div class="fc-icon" style="background:var(--purple-light)">⚙️</div>
+          <div class="fc-urgent-badge">1 urgent</div>
+        </div>
+        <div class="fc-name">Génie Industriel</div>
+        <div class="fc-niveau">1A · 2A · 4A · 5A</div>
+
+        <div class="fc-stats-row">
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value">65</div>
+            <div class="fc-stat-mini-label">Étudiants</div>
           </div>
-          <div class="phase-bar-wrap"><div class="phase-bar-fill fill-bleu" style="width:100%"></div></div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:#16a34a">52</div>
+            <div class="fc-stat-mini-label">En stage</div>
+          </div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:var(--orange)">5</div>
+            <div class="fc-stat-mini-label">Rapports</div>
+          </div>
+        </div>
+        <div class="fc-progress-wrap"><div class="fc-progress-fill" style="width:80%; background:linear-gradient(to right, var(--purple), #6d28d9)"></div></div>
+
+        <div class="fc-alerts">
+          <div class="fc-alert-line is-urgent"><span class="fc-alert-dot" style="background:var(--red)"></span> 1 soutenance sans jury complet</div>
+          <div class="fc-alert-line"><span class="fc-alert-dot" style="background:var(--orange)"></span> 5 rapports hebdo non lus</div>
         </div>
 
-        <!-- Phase ORANGE -->
-        <div class="phase-block phase-orange">
-          <span class="phase-dot dot-orange"></span>
-          <span class="phase-label label-orange">Phase Recherche</span>
-          <div class="phase-name">Stage confirmé</div>
-          <div>
-            <span class="phase-count">67</span>
-            <span class="phase-total">/ 90 étudiants</span>
-          </div>
-          <div class="phase-bar-wrap"><div class="phase-bar-fill fill-orange" style="width:74%"></div></div>
-        </div>
-
-        <!-- Phase JAUNE -->
-        <div class="phase-block phase-jaune">
-          <span class="phase-dot dot-jaune"></span>
-          <span class="phase-label label-jaune">Phase Soutenance</span>
-          <div class="phase-name">Infos jury saisies</div>
-          <div>
-            <span class="phase-count">12</span>
-            <span class="phase-total">/ 90 étudiants</span>
-          </div>
-          <div class="phase-bar-wrap"><div class="phase-bar-fill fill-jaune" style="width:13%"></div></div>
-        </div>
-
+        <button class="fc-action">Ouvrir le dashboard →</button>
       </div>
+
+      <!-- Finance - ok -->
+      <div class="filiere-card ok">
+        <div class="fc-top">
+          <div class="fc-icon" style="background:var(--green-light)">💰</div>
+          <div class="fc-ok-badge">Tout est à jour</div>
+        </div>
+        <div class="fc-name">Finance</div>
+        <div class="fc-niveau">1A · 2A · 4A · 5A</div>
+
+        <div class="fc-stats-row">
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value">48</div>
+            <div class="fc-stat-mini-label">Étudiants</div>
+          </div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:#16a34a">23</div>
+            <div class="fc-stat-mini-label">En stage</div>
+          </div>
+          <div class="fc-stat-mini">
+            <div class="fc-stat-mini-value" style="color:var(--text)">1</div>
+            <div class="fc-stat-mini-label">Rapports</div>
+          </div>
+        </div>
+        <div class="fc-progress-wrap"><div class="fc-progress-fill" style="width:48%; background:linear-gradient(to right, var(--green), #16a34a)"></div></div>
+
+        <div class="fc-alerts">
+          <div class="fc-alert-line"><span class="fc-alert-dot" style="background:var(--green)"></span> Aucune alerte urgente</div>
+          <div class="fc-alert-line"><span class="fc-alert-dot" style="background:var(--border)"></span> 1 rapport hebdo non lu</div>
+        </div>
+
+        <button class="fc-action">Ouvrir le dashboard →</button>
+      </div>
+
     </div>
 
-    <!-- GRILLE PRINCIPALE -->
-    <div class="grid-2">
-
-      <!-- COLONNE GAUCHE — Tableau suivi étudiants -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">👥 Suivi par classe</div>
-          <button class="btn-outline btn" style="padding:7px 14px; font-size:12.5px">Voir tout →</button>
-        </div>
-        <div class="card-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Étudiant</th>
-                  <th>Statut</th>
-                  <th>Encadrant académique / entreprise</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="student-cell">
-                      <div class="student-avatar" style="background:linear-gradient(135deg,#0EA5E9,#0369a1)">SF</div>
-                      <div>
-                        <div class="student-name">Sara Filali</div>
-                        <div class="student-niveau">5A</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="pill pill-green">En cours</span></td>
-                  <td class="encadrant-cell">
-                    <div class="encadrant-acad">🎓 Pr. Benali</div>
-                    <div class="encadrant-entr">🏢 M. Idrissi — OCP Group</div>
-                  </td>
-                  <td><button class="btn-sm btn-sm-teal">Voir</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="student-cell">
-                      <div class="student-avatar" style="background:linear-gradient(135deg,#F97316,#ea580c)">AM</div>
-                      <div>
-                        <div class="student-name">Amine Moussaoui</div>
-                        <div class="student-niveau">5A</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="pill pill-orange">Confirmé</span></td>
-                  <td class="encadrant-cell">
-                    <div class="encadrant-missing">⚠️ Non affecté</div>
-                  </td>
-                  <td><button class="btn-sm btn-sm-primary">Affecter</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="student-cell">
-                      <div class="student-avatar" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">KB</div>
-                      <div>
-                        <div class="student-name">Karim Bennani</div>
-                        <div class="student-niveau">4A</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="pill pill-red">Non trouvé</span></td>
-                  <td class="encadrant-cell">
-                    <span style="color:var(--text-muted); font-size:12px">— Alternance, sans encadrant académique</span>
-                  </td>
-                  <td><button class="btn-sm btn-sm-orange">Notifier</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="student-cell">
-                      <div class="student-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6d28d9)">LA</div>
-                      <div>
-                        <div class="student-name">Leila Amrani</div>
-                        <div class="student-niveau">5A</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="pill pill-blue">CV en validation</span></td>
-                  <td class="encadrant-cell">
-                    <span style="color:var(--text-muted); font-size:12px">— En attente de confirmation</span>
-                  </td>
-                  <td><button class="btn-sm btn-sm-teal">Voir</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="student-cell">
-                      <div class="student-avatar" style="background:linear-gradient(135deg,#0EA5E9,#0369a1)">YA</div>
-                      <div>
-                        <div class="student-name">Youssef Alami</div>
-                        <div class="student-niveau">5A</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="pill pill-green">En cours</span></td>
-                  <td class="encadrant-cell">
-                    <div class="encadrant-acad">🎓 Pr. Khalil</div>
-                    <div class="encadrant-entr">🏢 Mme Tazi — Inwi</div>
-                  </td>
-                  <td><button class="btn-sm btn-sm-teal">Voir</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="table-footer">
-            <div class="filter-tabs">
-              <div class="filter-tab active">Tous</div>
-              <div class="filter-tab">Phase Bleu</div>
-              <div class="filter-tab">Phase Orange</div>
-              <div class="filter-tab">Phase Jaune</div>
-            </div>
-            <div class="table-footer-text">5 sur 90 étudiants</div>
-          </div>
-        </div>
+    <!-- Comparative table -->
+    <div class="section-title">📊 Comparatif détaillé</div>
+    <div class="compare-card">
+      <div class="card-header">
+        <div class="card-title">Vue d'ensemble par filière</div>
       </div>
-
-      <!-- COLONNE DROITE -->
-      <div style="display:flex; flex-direction:column; gap:20px">
-
-        <!-- Rapports hebdo non lus — PRIORITÉ -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📝 Rapports hebdo — Semaine 7</div>
-            <span class="pill pill-orange">8 non lus</span>
-          </div>
-          <div class="card-body">
-            <div class="rapport-item">
-              <div class="rapport-unread-dot"></div>
-              <div class="rapport-info">
-                <div class="rapport-name">Ornella Zombré</div>
-                <div class="rapport-meta">Encadrant : Pr. Benali</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Filière</th>
+            <th class="center">Étudiants</th>
+            <th class="center">En stage</th>
+            <th class="center">Taux placement</th>
+            <th class="center">Encadrants affectés</th>
+            <th class="center">Rapports non lus</th>
+            <th class="center">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="filiere-name-cell">
+                <div class="filiere-dot" style="background:var(--teal)"></div>
+                Génie Informatique
               </div>
-              <span class="rapport-week-badge">Non lu</span>
-            </div>
-            <div class="rapport-item">
-              <div class="rapport-unread-dot"></div>
-              <div class="rapport-info">
-                <div class="rapport-name">Youssef Alami</div>
-                <div class="rapport-meta">Encadrant : Pr. Khalil</div>
+            </td>
+            <td class="center">90</td>
+            <td class="center">67</td>
+            <td class="center">74%</td>
+            <td class="center">42 / 45</td>
+            <td class="center">8</td>
+            <td class="center"><span class="pill pill-red">Urgent</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="filiere-name-cell">
+                <div class="filiere-dot" style="background:var(--purple)"></div>
+                Génie Industriel
               </div>
-              <span class="rapport-week-badge">Non lu</span>
-            </div>
-            <div class="rapport-item">
-              <div class="rapport-unread-dot"></div>
-              <div class="rapport-info">
-                <div class="rapport-name">Sara Filali</div>
-                <div class="rapport-meta">Encadrant : Pr. Benali</div>
+            </td>
+            <td class="center">65</td>
+            <td class="center">52</td>
+            <td class="center">80%</td>
+            <td class="center">48 / 52</td>
+            <td class="center">5</td>
+            <td class="center"><span class="pill pill-orange">À surveiller</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="filiere-name-cell">
+                <div class="filiere-dot" style="background:var(--green)"></div>
+                Finance
               </div>
-              <span class="rapport-week-badge">Non lu</span>
-            </div>
-            <div class="rapport-item">
-              <div class="rapport-read-dot"></div>
-              <div class="rapport-info">
-                <div class="rapport-name">Karim Idrissi</div>
-                <div class="rapport-meta">Encadrant : Pr. Tazi</div>
-              </div>
-              <span class="pill pill-gray" style="font-size:10px">Lu</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Séances à venir -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📅 Séances à venir</div>
-          </div>
-          <div class="card-body">
-            <div class="seance-row">
-              <div class="seance-date-block">
-                <div class="seance-day">18</div>
-                <div class="seance-month">Juin</div>
-              </div>
-              <div class="seance-info">
-                <div class="seance-student">Ornella Zombré</div>
-                <div class="seance-detail">Pr. Benali · 📍 Présentiel · 10h00</div>
-              </div>
-              <span class="pill pill-blue" style="font-size:10px">Confirmée</span>
-            </div>
-            <div class="seance-row">
-              <div class="seance-date-block">
-                <div class="seance-day">20</div>
-                <div class="seance-month">Juin</div>
-              </div>
-              <div class="seance-info">
-                <div class="seance-student">Youssef Alami</div>
-                <div class="seance-detail">Pr. Khalil · 💬 WhatsApp</div>
-              </div>
-              <span class="pill pill-blue" style="font-size:10px">Confirmée</span>
-            </div>
-            <div class="seance-row">
-              <div class="seance-date-block">
-                <div class="seance-day">25</div>
-                <div class="seance-month">Juin</div>
-              </div>
-              <div class="seance-info">
-                <div class="seance-student">Sara Filali</div>
-                <div class="seance-detail">Pr. Benali · 📍 Présentiel</div>
-              </div>
-              <span class="pill pill-gray" style="font-size:10px">À confirmer</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Note module soutenances — placeholder désactivé -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🏛️ Soutenances</div>
-          </div>
-          <div class="empty-soutenance-note">
-            🔧 Module de planification automatique à venir. Chaque chef de filière garde sa méthode actuelle pour l'instant.
-          </div>
-        </div>
-
-      </div>
+            </td>
+            <td class="center">48</td>
+            <td class="center">23</td>
+            <td class="center">48%</td>
+            <td class="center">23 / 23</td>
+            <td class="center">1</td>
+            <td class="center"><span class="pill pill-green">À jour</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
   </div>
